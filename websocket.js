@@ -1,49 +1,3 @@
-import "https://unpkg.com/simple-peer@9.9.3/simplepeer.min.js";
-
-const cavas = document.getElementById('canvas');
-const context = canvas.getContext("2d");
-
-const state = {
-  canvas,
-  context,
-  localId: undefined,
-  peerIds: [],
-  peerConnections: {},
-  initiator: false,
-};
-
-function broadcast(event) {
-  Object.values(state.peerConnections).forEach(peer => {
-    peer.send(JSON.stringify(event));
-  });
-}
-
-let lastPoint;
-function drawPoint(a, b) {
-  context.strokeStyle = "red",
-  context.beginPath();
-  context.moveTo(a.x, a.y);
-  context.lineTo(b.x, b.y);
-  context.lineWidth = 5;
-  context.lineCap = "round";
-  context.stroke();
-}
-window.onmousemove = function(e) {
-  const thisPoint = { x: e.offsetX, y: e.offsetY };
-  if (!lastPoint) {
-    lastPoint = thisPoint;
-  }
-  if (e.buttons) {
-    drawPoint(lastPoint, thisPoint);
-    broadcast({ type: "draw", from: lastPoint, to: thisPoint });
-  }
-  lastPoint = thisPoint;
-};
-window.onmousedown = function(e) {
-  const thisPoint = { x: e.offsetX, y: e.offsetY };
-  drawPoint(thisPoint, thisPoint);
-};
-
 const wsConn = new WebSocket("ws:127.0.0.1:8888");
 wsConn.onopen = (e) => {
   console.log("websocket open", e);
@@ -66,17 +20,6 @@ wsConn.onmessage = (e) => {
       break;
   }
 };
-
-function onPeerData(id, buffer) {
-  const data = JSON.parse(buffer);
-  switch (data.type) {
-    case "draw":
-      drawPoint(data.from, data.to);
-      break;
-    default:
-      console.log(`Unknown message from ${id}`, data);
-  }
-}
 
 function connect() {
   Object.keys(state.peerConnections).forEach(id => {
@@ -112,6 +55,3 @@ function signal(id, data) {
     state.peerConnections[id].signal(data);
   }
 }
-
-window.state = state;
-window.wsConn = wsConn;
