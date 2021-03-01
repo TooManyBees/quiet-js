@@ -10,37 +10,37 @@ const state = {
 };
 
 let lastPoint;
-function drawPoint(a, b) {
+function drawPoint(a, b, weight) {
   state.context.strokeStyle = "red",
   state.context.beginPath();
   state.context.moveTo(a.x, a.y);
   state.context.lineTo(b.x, b.y);
-  state.context.lineWidth = 5;
+  state.context.lineWidth = 10 * weight;
   state.context.lineCap = "round";
   state.context.stroke();
 }
-window.onmousemove = function(e) {
+canvas.onpointermove = function(e) {
   const thisPoint = { x: e.offsetX, y: e.offsetY };
   if (!lastPoint) {
     lastPoint = thisPoint;
   }
   if (e.buttons) {
-    drawPoint(lastPoint, thisPoint);
-    broadcast({ type: "draw", from: lastPoint, to: thisPoint });
+    drawPoint(lastPoint, thisPoint, e.pressure);
+    broadcast({ type: "draw", from: lastPoint, to: thisPoint, weight: e.pressure });
   }
   lastPoint = thisPoint;
 };
-window.onmousedown = function(e) {
+canvas.onpointerdown = function(e) {
   const thisPoint = { x: e.offsetX, y: e.offsetY };
-  drawPoint(thisPoint, thisPoint);
-  broadcast({ type: "draw", from: thisPoint, to: thisPoint });
+  drawPoint(thisPoint, thisPoint, e.pressure);
+  broadcast({ type: "draw", from: thisPoint, to: thisPoint, weight: e.pressure });
 };
 
 function onPeerData(id, buffer) {
   const data = JSON.parse(buffer);
   switch (data.type) {
     case "draw":
-      drawPoint(data.from, data.to);
+      drawPoint(data.from, data.to, data.weight);
       break;
     default:
       console.log(`Unknown message from ${id}`, data);
