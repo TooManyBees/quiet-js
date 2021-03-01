@@ -9,7 +9,7 @@ const dotenv = require("dotenv");
 dotenv.config();
 
 const app = express();
-app.use(express.static(__dirname));
+app.use(express.static(path.join(__dirname, "..", "client")));
 app.use(express.json());
 app.locals.rooms = new Map();
 app.locals.clients = new Map();
@@ -103,7 +103,7 @@ app.get("/connect", auth, (req, res) => {
 });
 
 app.get("/:roomId", (req, res) => {
-  res.sendFile(path.join(__dirname, "index.html"));
+  res.sendFile(path.join(__dirname, "..", "client", "index.html"));
 });
 
 app.post("/:roomId/join", auth, (req, res) => {

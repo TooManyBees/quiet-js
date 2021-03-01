@@ -1,4 +1,4 @@
-const cavas = document.getElementById('canvas');
+const canvas = document.getElementById('canvas');
 
 const state = {
   canvas,
@@ -71,6 +71,7 @@ canvas.onpointerup = endDrawing;
 
 function onPeerData(id, buffer) {
   const data = JSON.parse(buffer);
+  console.log(data);
   switch (data.type) {
     case "draw":
       drawPoint(data.p);

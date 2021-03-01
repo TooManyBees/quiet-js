@@ -53,6 +53,7 @@ let needHistory = true;
 
 function addPeer(data) {
   const message = JSON.parse(data.data);
+  console.log(message);
   if (context.peers[message.peer.id]) {
     return;
   }
