@@ -80,6 +80,25 @@ function onPeerData(id, buffer) {
         drawPoint(p);
       }
       break;
+    case "get-history": {
+      if (needHistory) {
+        const { width, height, bytes } = data.canvas;
+        const imageData = new ImageData(Uint8ClampedArray.from(bytes), width, height);
+        state.context.putImageData(imageData, 0, 0);
+        needHistory = false; // FIXME: this is in another file; sort this out
+        break;
+      }
+    }
+    case "request-history": {
+      const imageData = state.context.getImageData(0, 0, canvas.width, canvas.height);
+      const message = {
+        width: imageData.width,
+        height: imageData.height,
+        bytes: Array.from(imageData.data),
+      };
+      sendMessage(id, { type: "get-history", canvas: message });
+      break;
+    }
     default:
       console.log(`Unknown message from ${id}`, data);
   }

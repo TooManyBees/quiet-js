@@ -49,6 +49,8 @@ async function connect() {
   context.eventSource.addEventListener("connected", () => join(), false);
 }
 
+let needHistory = true;
+
 function addPeer(data) {
   const message = JSON.parse(data.data);
   if (context.peers[message.peer.id]) {
@@ -68,6 +70,11 @@ function addPeer(data) {
     const channel = peer.createDataChannel("updates");
     channel.onmessage = function(event) {
       onPeerData(message.peer.id, event.data);
+    };
+    channel.onopen = function() {
+      if (needHistory) {
+        channel.send(JSON.stringify({ type: "request-history" }));
+      }
     };
     context.channels[message.peer.id] = channel;
     createOffer(message.peer.id, peer);
@@ -112,6 +119,10 @@ function broadcast(data) {
   for (const peerId in context.channels) {
     context.channels[peerId].send(JSON.stringify(data));
   }
+}
+
+function sendMessage(peerId, data) {
+  context.channels[peerId].send(JSON.stringify(data));
 }
 
 async function relay(peerId, event, data) {
