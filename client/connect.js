@@ -1,5 +1,4 @@
 const context = {
-  username: `user-${parseInt(Math.random() * 100000)}`,
   roomId: window.location.pathname.substr(1),
   token: null,
   eventSource: null,
@@ -13,7 +12,6 @@ async function getToken() {
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ username: context.username }),
   });
   const data = await res.json();
   context.token = data.token;

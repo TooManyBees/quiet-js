@@ -47,13 +47,8 @@ app.post("/relay/:peerId/:event", auth, (req, res) => {
 });
 
 app.post("/access", (req, res) => {
-  if (!req.body.username) {
-    return res.sendStatus(400);
-  }
-
   const user = {
     id: uuid.v4(),
-    username: req.body.username,
   };
 
   const token = jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: "3600s" });
