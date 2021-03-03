@@ -69,10 +69,17 @@ canvas.onpointercancel = endDrawing;
 canvas.onpointerleave = endDrawing;
 canvas.onpointerup = endDrawing;
 
+let needHistory = true;
+
 function onPeerData(id, buffer) {
   const data = JSON.parse(buffer);
   console.log(data);
   switch (data.type) {
+    case "new-connection":
+      if (needHistory) {
+        sendMessage(id, { type: "request-history" });
+      }
+      break;
     case "draw":
       drawPoint(data.p);
       break;
@@ -90,7 +97,7 @@ function onPeerData(id, buffer) {
           const imageData = new ImageData(Uint8ClampedArray.from(bytes), width, height);
           state.context.putImageData(imageData, 0, 0);
         }
-        needHistory = false; // FIXME: this is in another file; sort this out
+        needHistory = false;
         break;
       }
     }
@@ -109,3 +116,5 @@ function onPeerData(id, buffer) {
       console.log(`Unknown message from ${id}`, data);
   }
 }
+
+connect(onPeerData);

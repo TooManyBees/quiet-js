@@ -36,20 +36,18 @@ const rtcConfig = {
   }],
 };
 
-async function connect() {
+async function connect(onPeerData) {
   await getToken();
 
   context.eventSource = new EventSource(`/connect?token=${context.token}`);
-  context.eventSource.addEventListener("add-peer", addPeer, false);
+  context.eventSource.addEventListener("add-peer", (peer) => addPeer(peer, onPeerData), false);
   context.eventSource.addEventListener("remove-peer", removePeer, false);
   context.eventSource.addEventListener("session-description", sessionDescription, false);
   context.eventSource.addEventListener("ice-candidate", iceCandidate, false);
   context.eventSource.addEventListener("connected", () => join(), false);
 }
 
-let needHistory = true;
-
-function addPeer(data) {
+function addPeer(data, onPeerData) {
   const message = JSON.parse(data.data);
   console.log(message);
   if (context.peers[message.peer.id]) {
@@ -71,9 +69,7 @@ function addPeer(data) {
       onPeerData(message.peer.id, event.data);
     };
     channel.onopen = function() {
-      if (needHistory) {
-        channel.send(JSON.stringify({ type: "request-history" }));
-      }
+      onPeerData(message.peer.id, JSON.stringify({ type: "new-connection" }));
     };
     context.channels[message.peer.id] = channel;
     createOffer(message.peer.id, peer);
@@ -140,5 +136,3 @@ async function createOffer(peerId, peer) {
   await peer.setLocalDescription(offer);
   await relay(peerId, "session-description", offer);
 }
-
-connect();
