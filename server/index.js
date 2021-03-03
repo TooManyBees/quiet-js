@@ -62,7 +62,7 @@ function disconnected(client) {
     if (room.has(client.id)) {
       for (const peerId of room) {
         const peer = clients.get(peerId);
-        peer && peer.emit('remove-peer', { peer: client.id, roomId });
+        peer && peer.emit('remove-peer', { peerId: client.id, roomId });
       }
       room.delete(client.id);
     }

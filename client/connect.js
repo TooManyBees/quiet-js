@@ -89,10 +89,10 @@ function addPeer(data) {
 
 function removePeer(data) {
   const message = JSON.parse(data.data);
-  if (context.peers[message.peer.id]) {
-    context.peers[message.peer.id].close();
+  if (context.peers[message.peerId]) {
+    context.peers[message.peerId].close();
   }
-  delete context.peers[message.peer.id];
+  delete context.peers[message.peerId];
 }
 
 async function sessionDescription(data) {
