@@ -7,7 +7,11 @@ let eventSource = null;
 const channels = {};
 
 const peersWritable = writable({});
-export const peers = derived(peersWritable, p => p);
+export const peerIds = derived(peersWritable, p => Object.keys(p));
+const userIdWritable = writable(null);
+export const userId = derived(userIdWritable, u => u);
+const userIdsWritable = writable([]);
+export const userIds = derived(userIdsWritable, l => l);
 
 async function getToken() {
   let res = await fetch("http://localhost:8888/access", {
@@ -19,6 +23,7 @@ async function getToken() {
   });
   const data = await res.json();
   token = data.token;
+  userIdWritable.set(data.userId);
 }
 
 function join() {
@@ -60,16 +65,14 @@ function addPeer(data, onPeerData) {
     }
   };
 
-  if (message.offer) {
+  if (message.offer) { // If client running this JS is new
     const channel = peer.createDataChannel("updates");
     channel.onmessage = function(event) {
       onPeerData(message.peer.id, event.data);
     };
     channel.onopen = function() {
-      onPeerData(message.peer.id, JSON.stringify({ type: 'new-connection'}));
-      // if (needHistory) {
-      //   channel.send(JSON.stringify({ type: "request-history" }));
-      // }
+      userIdsWritable.set(message.userIds);
+      onPeerData(message.peer.id, JSON.stringify({ type: "new-connection" }));
     };
     channels[message.peer.id] = channel;
     createOffer(message.peer.id, peer);
@@ -79,6 +82,8 @@ function addPeer(data, onPeerData) {
       event.channel.onmessage = function(evt) {
         onPeerData(message.peer.id, evt.data);
       };
+      userIdsWritable.set(message.userIds);
+      onPeerData(message.peer.id, JSON.stringify({ type: "introduce-yourself" }));
     };
   }
 }
@@ -92,6 +97,7 @@ function removePeer(data) {
       return peers;
     });
   }
+  userIdsWritable.set(message.userIds);
 }
 
 async function sessionDescription(data) {

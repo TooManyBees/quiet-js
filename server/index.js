@@ -42,9 +42,6 @@ app.post("/relay/:peerId/:event", auth, (req, res) => {
   const clients = app.locals.clients;
   const client = clients.get(peerId);
   if (client) {
-    // if (req.user.roomId !== client.roomId) {
-    //   return res.sendStatus(401);
-    // }
     client.emit(req.params.event, { peer: req.user, data: req.body });
   }
   res.sendStatus(200);
@@ -63,19 +60,20 @@ app.post("/access", (req, res) => {
   return res.json({ userId: user.id, token });
 });
 
-function disconnected(client) {
+function disconnected(user) {
   const { clients, rooms } = app.locals;
-  clients.delete(client.id);
-  for (const [roomId, room] of rooms) {
-    if (room.has(client.id)) {
-      for (const peerId of room) {
-        const peer = clients.get(peerId);
-        peer && peer.emit('remove-peer', { peerId: client.id, roomId });
-      }
-      room.delete(client.id);
+  console.log(`disconnecting ${user.id}`);
+  clients.delete(user.id);
+
+  const room = rooms.get(user.roomId);
+  if (room && room.includes(user.id)) {
+    room.splice(room.indexOf(user.id), 1);
+    for (const peerId of room) {
+      const peer = clients.get(peerId);
+      peer && peer.emit("remove-peer", { peerId: user.id, userIds: room });
     }
     if (room.size === 0) {
-      rooms.delete(roomId)
+      rooms.delete(roomId);
     }
   }
 }
@@ -102,7 +100,7 @@ app.get("/connect", auth, (req, res) => {
   app.locals.clients.set(client.id, client);
   client.emit("connected", { user: req.user });
 
-  req.on("close", () => disconnected(client));
+  req.on("close", () => disconnected(req.user));
 });
 
 app.get("/:roomId", (req, res) => {
@@ -110,29 +108,41 @@ app.get("/:roomId", (req, res) => {
 });
 
 app.post("/:roomId/join", auth, (req, res) => {
+  // TODO: check that req.params.roomId === req.user.roomId
   const roomId = req.params.roomId;
   const { clients, rooms } = app.locals;
   let room = rooms.get(roomId);
 
-  if (room && room.has(req.user.id)) {
+  if (room && room.includes(req.user.id)) {
     return res.sendStatus(204);
   }
 
   if (!room) {
-    room = new Set();
+    room = [];
     rooms.set(roomId, room);
   }
+
+  room.push(req.user.id);
 
   console.log(`user joining room ${roomId}: ${req.user.id}`);
 
   for (const peerId of room) {
+    if (peerId === req.user.id) continue;
     if (clients.has(peerId) && clients.has(req.user.id)) {
-      clients.get(peerId).emit("add-peer", { peer: req.user, offer: false });
-      clients.get(req.user.id).emit("add-peer", { peer: clients.get(peerId).user, roomId, offer: true });
+      clients.get(peerId).emit("add-peer", {
+        peer: req.user,
+        offer: false,
+        userIds: room,
+      });
+      clients.get(req.user.id).emit("add-peer", {
+        peer: clients.get(peerId).user,
+        roomId,
+        offer: true,
+        userIds: room,
+      });
     }
   }
 
-  room.add(req.user.id);
   return res.sendStatus(200);
 });
 

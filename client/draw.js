@@ -3,10 +3,6 @@ const canvas = document.getElementById('canvas');
 const state = {
   canvas,
   context: canvas.getContext("2d"),
-  localId: undefined,
-  peerIds: [],
-  peerConnections: {},
-  initiator: false,
   drawQueue: [],
 };
 

@@ -1,7 +1,8 @@
 <script>
 	import { onMount } from "svelte";
-	import { connect, peers, sendMessage, broadcast } from "./connection.js";
+	import { connect, userId, userIds, sendMessage, broadcast } from "./connection.js";
 	import Canvas from "./Canvas.svelte";
+	import Users from "./Users.svelte";
 
 	function handleDrawMulti(event) {
 		broadcast({ type: "drawmulti", ...event.detail });
@@ -9,19 +10,43 @@
 
 	let needHistory = true;
 
+	const userNames = new Map();
+	let userName = `cool user ${~~(Math.random() * 100)}`;
+	userId.subscribe((val) => {
+		if (val != null) {
+			userNames.set(val, userName);
+		}
+	});
+
+	function changeName(userId, name) {
+		userNames.set(userId, name);
+		userNames = userNames;
+	}
+
+	function changeMyName(name) {
+		userNames.set($userId, name);
+		userNames = userNames;
+		broadcast({ type: "change-name", name });
+	}
+
 	function onPeerData(peerId, buffer) {
 		let data;
 		try {
 			data = JSON.parse(buffer);
+			console.log(data);
 		} catch (e) {
 			console.error(`Error parsing JSON`, buffer);
 		}
 
 		switch (data.type) {
+		case "introduce-yourself":
+			sendMessage(peerId, { type: "change-name", name: userName });
 		case "new-connection":
 			if (needHistory) {
 				sendMessage(peerId, { type: "request-history" });
 			}
+			userNames[userId] = userName;
+			sendMessage(peerId, { type: "change-name", name: userName });
 			break;
 		case "draw":
 			canvas.draw([data.point]);
@@ -39,6 +64,9 @@
 			const canvasState = canvas.getState();
 			sendMessage(peerId, { type: "receive-history", canvas: canvasState });
 			break;
+		case "change-name":
+			changeName(peerId, data.name);
+			break;
 		default:
 			console.log(`Unkonwn message from ${peerId}: ${data.type}`);
 		}
@@ -46,21 +74,29 @@
 
 	let canvas;
 
+	$: users = $userIds.map(id => ({ id, name: userNames.get(id) || id }));
+
 	onMount(() => connect(onPeerData));
 </script>
 
 <main>
-	<h1>Be vewy, vewy quiet.</h1>
-	<p>Check out {JSON.stringify($peers)}</p>
 	<Canvas width={300} height={300} bind:this={canvas} on:drawmulti={handleDrawMulti} />
+	<p>You are {$userId}</p>
+	<p>{JSON.stringify(Array.from(userNames))}</p>
+	<p>{JSON.stringify(Array.from($userIds))}</p>
+	<Users
+		selfId={$userId}
+		users={users}
+		on:change-name={(event) => changeMyName(event.detail.name)}
+	/>
 </main>
 
 <style>
 	main {
-		text-align: center;
-		padding: 1em;
-		max-width: 240px;
-		margin: 0 auto;
+		/*text-align: center;*/
+		/*padding: 1em;*/
+		/*max-width: 240px;*/
+		/*margin: 0 auto;*/
 	}
 
 	h1 {
