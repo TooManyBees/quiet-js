@@ -6,12 +6,13 @@ const context = {
   channels: {},
 };
 
-async function getToken() {
+async function getToken(roomId) {
   let res = await fetch("/access", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
+    body: JSON.stringify({ roomId }),
   });
   const data = await res.json();
   context.token = data.token;
@@ -37,7 +38,7 @@ const rtcConfig = {
 };
 
 async function connect(onPeerData) {
-  await getToken();
+  await getToken(context.roomId);
 
   context.eventSource = new EventSource(`/connect?token=${context.token}`);
   context.eventSource.addEventListener("add-peer", (peer) => addPeer(peer, onPeerData), false);

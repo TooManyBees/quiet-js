@@ -40,19 +40,27 @@ app.get("/", (req, res) => {
 app.post("/relay/:peerId/:event", auth, (req, res) => {
   const peerId = req.params.peerId;
   const clients = app.locals.clients;
-  if (clients.has(peerId)) {
-    clients.get(peerId).emit(req.params.event, { peer: req.user, data: req.body });
+  const client = clients.get(peerId);
+  if (client) {
+    // if (req.user.roomId !== client.roomId) {
+    //   return res.sendStatus(401);
+    // }
+    client.emit(req.params.event, { peer: req.user, data: req.body });
   }
   res.sendStatus(200);
 });
 
 app.post("/access", (req, res) => {
+  if (!req.body.roomId) {
+    return res.sendStatus(400);
+  }
   const user = {
     id: uuid.v4(),
+    roomId: req.body.roomId,
   };
 
-  const token = jwt.sign(user, process.env.TOKEN_SECRET, { expiresIn: "3600s" });
-  return res.json({ token });
+  const token = jwt.sign(user, process.env.TOKEN_SECRET);
+  return res.json({ userId: user.id, token });
 });
 
 function disconnected(client) {
@@ -117,7 +125,7 @@ app.post("/:roomId/join", auth, (req, res) => {
 
   console.log(`user joining room ${roomId}: ${req.user.id}`);
 
-  for (const peerId of room.values()) {
+  for (const peerId of room) {
     if (clients.has(peerId) && clients.has(req.user.id)) {
       clients.get(peerId).emit("add-peer", { peer: req.user, offer: false });
       clients.get(req.user.id).emit("add-peer", { peer: clients.get(peerId).user, roomId, offer: true });
