@@ -3,6 +3,10 @@
 
   const EXPANSION = 1.25;
 
+  export let width = 300;
+  export let height = 300;
+  export let tool;
+
   let canvas;
   let context;
   let drawQueue = [];
@@ -10,9 +14,18 @@
   const QUEUE_INTERVAL = 1000;
   let lastPoint;
 
-  export let width = 300;
-  export let height = 300;
-  export let tool;
+  let cursor = "pointer";
+  $: switch (tool) {
+    case "draw":
+      cursor = "crosshair";
+      break;
+    case "zoom":
+      cursor = "zoom-in";
+      break;
+    case "pan":
+      cursor = "grab";
+      break;
+  }
 
   const dispatch = createEventDispatcher();
 
@@ -143,4 +156,9 @@
   }
 </style>
 
-<canvas width={width} height={height} bind:this={canvas}></canvas>
+<canvas
+  width={width}
+  height={height}
+  bind:this={canvas}
+  style={`cursor: ${cursor};`}
+></canvas>
