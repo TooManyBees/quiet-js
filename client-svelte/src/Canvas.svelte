@@ -10,6 +10,7 @@
 
   export let width = 300;
   export let height = 300;
+  export let tool;
 
   const dispatch = createEventDispatcher();
 
@@ -78,6 +79,8 @@
   }
 
   function onpointermove(e) {
+    if (tool !== "draw") return;
+
     const thisPoint = { x: e.offsetX, y: e.offsetY };
     if (!lastPoint) {
       lastPoint = thisPoint;
@@ -91,6 +94,8 @@
   }
 
   function onpointerdown(e) {
+    if (tool !== "draw") return;
+
     const thisPoint = { x: e.offsetX, y: e.offsetY };
     const message = { a: thisPoint, b: thisPoint, weight: e.pressure };
     drawPoint(message);
@@ -99,15 +104,20 @@
 
   onMount(() => {
     context = canvas.getContext("2d");
-    canvas.onpointermove = onpointermove;
-    canvas.onpointerdown = onpointerdown;
-    canvas.onpointercancel = endDrawing;
-    canvas.onpointerleave = endDrawing;
-    canvas.onpointerup = endDrawing;
+    canvas.addEventListener("pointermove", onpointermove);
+    canvas.addEventListener("pointerdown", onpointerdown);
+    canvas.addEventListener("pointercancel", endDrawing);
+    canvas.addEventListener("pointerleave", endDrawing);
+    canvas.addEventListener("pointerup", endDrawing);
   });
 
   onDestroy(() => {
     clearTimeout(queueTimeout);
+    canvas.removeEventListener("pointermove", onpointermove);
+    canvas.removeEventListener("pointerdown", onpointerdown);
+    canvas.removeEventListener("pointercancel", endDrawing);
+    canvas.removeEventListener("pointerleave", endDrawing);
+    canvas.removeEventListener("pointerup", endDrawing);
   });
 </script>
 

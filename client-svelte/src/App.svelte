@@ -2,21 +2,22 @@
 	import { onMount } from "svelte";
 	import { connect, userId, userIds, sendMessage, broadcast } from "./connection.js";
 	import Canvas from "./Canvas.svelte";
+	import Tools from "./Tools.svelte";
 	import Users from "./Users.svelte";
 
-	function handleDrawMulti(event) {
-		broadcast({ type: "drawmulti", ...event.detail });
-	}
-
-	let needHistory = true;
-
-	const userNames = new Map();
-	let userName = `cool user ${~~(Math.random() * 100)}`;
 	userId.subscribe((val) => {
 		if (val != null) {
 			userNames.set(val, userName);
 		}
 	});
+
+	const userNames = new Map();
+	let userName = `cool user ${~~(Math.random() * 100)}`;
+	$: users = $userIds.map(id => ({ id, name: userNames.get(id) || id }));
+
+	let needHistory = true;
+	let canvas;
+	let selectedTool = "draw";
 
 	function changeName(userId, name) {
 		userNames.set(userId, name);
@@ -27,6 +28,10 @@
 		userNames.set($userId, name);
 		userNames = userNames;
 		broadcast({ type: "change-name", name });
+	}
+
+	function handleDrawMulti(event) {
+		broadcast({ type: "drawmulti", ...event.detail });
 	}
 
 	function onPeerData(peerId, buffer) {
@@ -72,18 +77,21 @@
 		}
 	}
 
-	let canvas;
-
-	$: users = $userIds.map(id => ({ id, name: userNames.get(id) || id }));
-
 	onMount(() => connect(onPeerData));
 </script>
 
 <main>
-	<Canvas width={300} height={300} bind:this={canvas} on:drawmulti={handleDrawMulti} />
-	<p>You are {$userId}</p>
+	<Tools bind:selected={selectedTool} />
+	<Canvas
+		width={300}
+		height={300}
+		bind:this={canvas}
+		on:drawmulti={handleDrawMulti}
+		tool={selectedTool}
+	/>
+	<!-- <p>You are {$userId}</p>
 	<p>{JSON.stringify(Array.from(userNames))}</p>
-	<p>{JSON.stringify(Array.from($userIds))}</p>
+	<p>{JSON.stringify(Array.from($userIds))}</p> -->
 	<Users
 		selfId={$userId}
 		users={users}
@@ -97,18 +105,5 @@
 		/*padding: 1em;*/
 		/*max-width: 240px;*/
 		/*margin: 0 auto;*/
-	}
-
-	h1 {
-		color: #ff3e00;
-		text-transform: uppercase;
-		font-size: 4em;
-		font-weight: 100;
-	}
-
-	@media (min-width: 640px) {
-		main {
-			max-width: none;
-		}
 	}
 </style>
