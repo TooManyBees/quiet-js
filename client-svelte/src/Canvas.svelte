@@ -1,6 +1,8 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from "svelte";
 
+  const EXPANSION = 1.25;
+
   let canvas;
   let context;
   let drawQueue = [];
@@ -38,6 +40,20 @@
       const imageData = new ImageData(Uint8ClampedArray.from(bytes), width, height);
       context.putImageData(imageData, 0, 0);
     }
+  }
+
+  export function expand() {
+    const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
+
+    const width = Math.floor(canvas.width * EXPANSION);
+    const height = Math.floor(canvas.height * EXPANSION);
+    const marginX = Math.floor((width - canvas.width) / 2);
+    const marginY = Math.floor((height - canvas.height) / 2);
+
+    canvas.width = width;
+    canvas.height = height;
+    context.clearRect(0, 0, canvas.width, canvas.height);
+    context.putImageData(imageData, marginX, marginY);
   }
 
   function flushQueue(end) {

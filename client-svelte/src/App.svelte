@@ -34,6 +34,11 @@
 		broadcast({ type: "drawmulti", ...event.detail });
 	}
 
+	function expandCanvas() {
+		canvas.expand();
+		broadcast({ type: "expand-canvas" });
+	}
+
 	function onPeerData(peerId, buffer) {
 		let data;
 		try {
@@ -72,6 +77,9 @@
 		case "change-name":
 			changeName(peerId, data.name);
 			break;
+		case "expand-canvas":
+			canvas.expand();
+			break;
 		default:
 			console.log(`Unkonwn message from ${peerId}: ${data.type}`);
 		}
@@ -81,7 +89,10 @@
 </script>
 
 <main>
-	<Tools bind:selected={selectedTool} />
+	<Tools
+		bind:selected={selectedTool}
+		on:expand-canvas={expandCanvas}
+	/>
 	<Canvas
 		width={300}
 		height={300}
