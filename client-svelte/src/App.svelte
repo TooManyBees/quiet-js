@@ -100,9 +100,6 @@
 		on:drawmulti={handleDrawMulti}
 		tool={selectedTool}
 	/>
-	<!-- <p>You are {$userId}</p>
-	<p>{JSON.stringify(Array.from(userNames))}</p>
-	<p>{JSON.stringify(Array.from($userIds))}</p> -->
 	<Users
 		selfId={$userId}
 		users={users}
@@ -112,9 +109,8 @@
 
 <style>
 	main {
-		/*text-align: center;*/
-		/*padding: 1em;*/
-		/*max-width: 240px;*/
-		/*margin: 0 auto;*/
+		width: 100%;
+		height: 100%;
+		overflow: hidden;
 	}
 </style>

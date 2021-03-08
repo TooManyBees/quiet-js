@@ -152,7 +152,12 @@
 
 <style>
   canvas {
-    outline: 1px solid red;
+    background-color: white;
+    outline: 20px solid #eee;
+    position: relative;
+    top: 50%; /* TODO: become a prop */
+    left: 50%; /* TODO: become a prop; */
+    transform: translate(-50%, -50%);
   }
 </style>
 
