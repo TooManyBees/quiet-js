@@ -16,16 +16,33 @@
   let lastPoint;
 
   let cursor = "pointer";
+  let altKey = false;
   $: switch (tool) {
     case "draw":
       cursor = "crosshair";
       break;
     case "zoom":
-      cursor = "zoom-in";
+      if (altKey) {
+        cursor = "zoom-out";
+      } else {
+        cursor = "zoom-in";
+      }
       break;
     case "pan":
       cursor = "grab";
       break;
+  }
+
+  function handleKeydown(e) {
+    if (e.key === "Alt") {
+      altKey = true;
+    }
+  }
+
+  function handleKeyup(e) {
+    if (e.key === "Alt") {
+      altKey = false;
+    }
   }
 
   const dispatch = createEventDispatcher();
@@ -125,6 +142,16 @@
     panY = event.detail.y;
   }
 
+  let zoom = 1.0;
+
+  function handleZoomIn() {
+    zoom = zoom * 1.5;
+  }
+
+  function handleZoomOut() {
+    zoom = zoom / 1.5;
+  }
+
   onMount(() => {
     context = canvas.getContext("2d");
   });
@@ -146,6 +173,8 @@
 <svelte:window
   bind:innerWidth={windowWidth}
   bind:innerHeight={windowHeight}
+  on:keydown={handleKeydown}
+  on:keyup={handleKeyup}
 />
 
 <canvas
@@ -156,5 +185,12 @@
   on:drawline={handleDrawLine}
   on:drawend={handleDrawEnd}
   on:pan={handlePan}
-  style={`cursor: ${cursor}; left: ${canvasX}px; top: ${canvasY}px;`}
+  on:zoom-in={handleZoomIn}
+  on:zoom-out={handleZoomOut}
+  style={`
+    cursor: ${cursor};
+    left: ${canvasX}px;
+    top: ${canvasY}px;
+    transform: translate(-50%, -50%) scale(${zoom});
+  `}
 ></canvas>

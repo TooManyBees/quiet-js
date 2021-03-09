@@ -74,12 +74,22 @@ export default function(node, tool) {
   }
   /*---------- End panning controls ----------*/
 
+  /*---------- Begin zoom controls -----------*/
+  function zoom(e) {
+    if (e.altKey) {
+      node.dispatchEvent(new CustomEvent("zoom-out"));
+    } else {
+      node.dispatchEvent(new CustomEvent("zoom-in"));
+    }
+  }
+  /*----------- End zoom controls ------------*/
+
   function onpointerdown(e) {
     switch (tool) {
     case "draw":
       return drawstart(e);
     case "zoom":
-      return; // TODO
+      return zoom(e);
     case "pan":
       return panstart(e);
     }
