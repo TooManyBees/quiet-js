@@ -1,5 +1,6 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from "svelte";
+  import pointerEvents from "./pointer-events.js";
 
   const EXPANSION = 1.25;
 
@@ -31,7 +32,7 @@
 
   export function draw(points) {
     for (const point of points) {
-      drawPoint(point);
+      drawLine(point);
     }
   }
 
@@ -89,11 +90,7 @@
     }
   }
 
-  function endDrawing() {
-    canvas.removeEventListener("pointermove", drawmove);
-    canvas.removeEventListener("pointercancel", endDrawing);
-    canvas.removeEventListener("pointerleave", endDrawing);
-    canvas.removeEventListener("pointerup", endDrawing);
+  function handleDrawEnd() {
     if (queueTimeout && drawQueue.length > 0) {
       clearTimeout(queueTimeout);
       queueTimeout = null;
@@ -101,7 +98,7 @@
     }
   }
 
-  function drawPoint({ a, b, weight }) {
+  function drawLine({ a, b, weight }) {
     context.strokeStyle = "red",
     context.beginPath();
     context.moveTo(a.x, a.y);
@@ -111,81 +108,29 @@
     context.stroke();
   }
 
-  function drawmove(e) {
-    const thisPoint = { x: e.offsetX, y: e.offsetY };
-    const message = { a: lastPoint, b: thisPoint, weight: e.pressure };
-    if (e.buttons) {
-      drawPoint(message);
-      queueDrawing(message);
-    }
-    lastPoint = thisPoint;
-  }
-
-  function onpointerdown(e) {
-    switch (tool) {
-    case "draw":
-      return drawstart(e);
-    case "zoom":
-      return; // TODO
-    case "pan":
-      return panstart(e);
-    }
-  }
-
-  function drawstart(e) {
-    const thisPoint = { x: e.offsetX, y: e.offsetY };
-    lastPoint = thisPoint;
-    const message = { a: thisPoint, b: thisPoint, weight: e.pressure };
-    drawPoint(message);
-    queueDrawing(message);
-
-    canvas.addEventListener("pointermove", drawmove);
-    canvas.addEventListener("pointercancel", endDrawing);
-    canvas.addEventListener("pointerleave", endDrawing);
-    canvas.addEventListener("pointerup", endDrawing);
+  function handleDrawLine(event) {
+    drawLine(event.detail);
+    queueDrawing(event.detail);
   }
 
   let windowWidth;
   let windowHeight;
   let panX = 0;
   let panY = 0;
-  let cursorPanX;
-  let cursorPanY;
   $: canvasX = windowWidth / 2 + panX;
   $: canvasY = windowHeight / 2 + panY;
 
-  function panstart(e) {
-    cursorPanX = e.clientX;
-    cursorPanY = e.clientY;
-
-    canvas.addEventListener("pointermove", panmove);
-    canvas.addEventListener("pointercancel", panend);
-    canvas.addEventListener("pointerleave", panend);
-    canvas.addEventListener("pointerup", panend);
-  }
-
-  function panmove(e) {
-    panX += (e.clientX - cursorPanX);
-    panY += (e.clientY - cursorPanY);
-    cursorPanX = e.clientX;
-    cursorPanY = e.clientY;
-  }
-
-  function panend() {
-    canvas.removeEventListener("pointermove", panmove);
-    canvas.removeEventListener("pointercancel", panend);
-    canvas.removeEventListener("pointerleave", panend);
-    canvas.removeEventListener("pointerup", panend);
+  function handlePan(event) {
+    panX = event.detail.x;
+    panY = event.detail.y;
   }
 
   onMount(() => {
     context = canvas.getContext("2d");
-    canvas.addEventListener("pointerdown", onpointerdown);
   });
 
   onDestroy(() => {
     clearTimeout(queueTimeout);
-    canvas.removeEventListener("pointerdown", onpointerdown);
   });
 </script>
 
@@ -207,5 +152,9 @@
   width={width}
   height={height}
   bind:this={canvas}
+  use:pointerEvents={tool}
+  on:drawline={handleDrawLine}
+  on:drawend={handleDrawEnd}
+  on:pan={handlePan}
   style={`cursor: ${cursor}; left: ${canvasX}px; top: ${canvasY}px;`}
 ></canvas>
