@@ -58,6 +58,10 @@
   label, button {
     cursor: pointer;
   }
+
+  .selected {
+    text-decoration: underline;
+  }
 </style>
 
 <svelte:window
@@ -67,7 +71,7 @@
 
 <div id="tool-palette">
   {#each tools as tool}
-    <label>
+    <label class:selected={tool === selected}>
       <input
         type="radio"
         bind:group={selectedButton}

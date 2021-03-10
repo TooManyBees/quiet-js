@@ -89,16 +89,16 @@
 </script>
 
 <main>
-	<Tools
-		bind:selected={selectedTool}
-		on:expand-canvas={expandCanvas}
-	/>
 	<Canvas
-		width={300}
-		height={300}
+		width={256}
+		height={256}
 		bind:this={canvas}
 		on:drawmulti={handleDrawMulti}
 		tool={selectedTool}
+	/>
+	<Tools
+		bind:selected={selectedTool}
+		on:expand-canvas={expandCanvas}
 	/>
 	<Users
 		selfId={$userId}

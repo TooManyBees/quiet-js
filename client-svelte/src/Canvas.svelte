@@ -2,10 +2,10 @@
   import { onMount, onDestroy, createEventDispatcher } from "svelte";
   import pointerEvents from "./pointer-events.js";
 
-  const EXPANSION = 1.25;
+  const EXPANSION = 256;
 
-  export let width = 300;
-  export let height = 300;
+  export let width = 256;
+  export let height = 256;
   export let tool;
 
   let canvas;
@@ -76,8 +76,8 @@
   export function expand() {
     const imageData = context.getImageData(0, 0, canvas.width, canvas.height);
 
-    const width = Math.floor(canvas.width * EXPANSION);
-    const height = Math.floor(canvas.height * EXPANSION);
+    const width = Math.floor(canvas.width + EXPANSION);
+    const height = Math.floor(canvas.height + EXPANSION);
     const marginX = Math.floor((width - canvas.width) / 2);
     const marginY = Math.floor((height - canvas.height) / 2);
 
