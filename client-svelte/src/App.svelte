@@ -1,6 +1,7 @@
 <script>
 	import { onMount } from "svelte";
 	import { connect, userId, userIds, sendMessage, broadcast } from "./connection.js";
+	import { getUserName, setUserName } from "./storage.js";
 	import Canvas from "./Canvas.svelte";
 	import Tools from "./Tools.svelte";
 	import Users from "./Users.svelte";
@@ -12,7 +13,7 @@
 	});
 
 	const userNames = new Map();
-	let userName = `cool user ${~~(Math.random() * 100)}`;
+	let userName = getUserName() || `cool user ${~~(Math.random() * 100)}`;
 	$: users = $userIds.map(id => ({ id, name: userNames.get(id) || id }));
 
 	let needHistory = true;
@@ -27,6 +28,7 @@
 	function changeMyName(name) {
 		userNames.set($userId, name);
 		userNames = userNames;
+		setUserName(name);
 		broadcast({ type: "change-name", name });
 	}
 
