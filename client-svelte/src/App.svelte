@@ -2,7 +2,10 @@
 	import { onMount } from "svelte";
 	import { connect, userId, userIds, sendMessage, broadcast } from "./connection.js";
 	import { getUserName, setUserName } from "./storage.js";
+	import { initialState, reducer } from "./reducer.js";
 	import Canvas from "./Canvas.svelte";
+	import Modal from "./Modal.svelte";
+	import StartGame from "./Modal/StartGame.svelte";
 	import Tools from "./Tools.svelte";
 	import Users from "./Users.svelte";
 
@@ -13,12 +16,40 @@
 	});
 
 	const userNames = new Map();
+	const contempt = new Map();
+	let state = initialState();
 	let userName = getUserName() || `cool user ${~~(Math.random() * 100)}`;
-	$: users = $userIds.map(id => ({ id, name: userNames.get(id) || id }));
+	$: users = $userIds.map(id => ({
+		id,
+		name: userNames.get(id) || id,
+		contempt: contempt.get(id) || 0,
+	}));
 
 	let needHistory = true;
 	let canvas;
 	let selectedTool = "draw";
+	$: currentId = $userIds[state.turnNumber % $userIds.length];
+	$: yourTurn = $userId === currentId;
+	$: drawn = state.yourTurn && state.yourTurn.drawn;
+
+	function initiateStartGame() {
+		state = reducer(state, { type: "game:initiate-start" });
+	}
+
+	function startGame(event) {
+		const fleeting = !!event.detail.fleeting;
+		state = reducer(state, { type: "game:start", payload: { fleeting } });
+		broadcast({ type: "update-state", state });
+	}
+
+	function drawCard() {
+		state = reducer(state, { type: "game:draw-card" });
+	}
+
+	function passTurn() {
+		state = reducer(state, { type: "game:next-turn" });
+		broadcast({ type: "update-state", state });
+	}
 
 	function changeName(userId, name) {
 		userNames.set(userId, name);
@@ -82,6 +113,9 @@
 		case "expand-canvas":
 			canvas.expand();
 			break;
+		case "update-state":
+			state = data.state;
+			break;
 		default:
 			console.log(`Unkonwn message from ${peerId}: ${data.type}`);
 		}
@@ -98,15 +132,29 @@
 		on:drawmulti={handleDrawMulti}
 		tool={selectedTool}
 	/>
-	<Tools
-		bind:selected={selectedTool}
-		on:expand-canvas={expandCanvas}
-	/>
-	<Users
-		selfId={$userId}
-		users={users}
-		on:change-name={(event) => changeMyName(event.detail.name)}
-	/>
+	<div class="wrapper">
+		<Tools
+			bind:selected={selectedTool}
+			on:expand-canvas={expandCanvas}
+			yourTurn={yourTurn}
+		/>
+		<Users
+			selfId={$userId}
+			users={users}
+			currentId={currentId}
+			drawn={drawn}
+			phase={state.phase}
+			on:change-name={(event) => changeMyName(event.detail.name)}
+			on:start-game={initiateStartGame}
+			on:draw-card={drawCard}
+			on:pass-turn={passTurn}
+		/>
+	</div>
+	{#if state.phase === "starting"}
+		<Modal>
+			<StartGame on:start-game={startGame} />
+		</Modal>
+	{/if}
 </main>
 
 <style>
@@ -114,5 +162,20 @@
 		width: 100%;
 		height: 100%;
 		overflow: hidden;
+	}
+	.wrapper {
+		position: fixed;
+		top: 0;
+		left: 0;
+		width: 100%;
+		box-sizing: border-box;
+		padding: 10px;
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+		pointer-events: none;
+	}
+	.wrapper > :global(*) {
+		pointer-events: auto;
 	}
 </style>

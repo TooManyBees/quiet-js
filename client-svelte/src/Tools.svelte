@@ -1,6 +1,7 @@
 <script>
   import { createEventDispatcher } from "svelte";
   export let selected = "draw";
+  export let yourTurn;
   const tools = ["draw", "zoom", "pan"];
   let selectedButton = "draw";
   let selectedOverride = null;
@@ -37,10 +38,6 @@
     display: flex;
     justify-content: space-between;
     align-items: center;
-    width: 15rem;
-    position: fixed;
-    top: 10px;
-    left: 10px;
   }
 
   #tool-palette > * {
@@ -62,6 +59,11 @@
   .selected {
     text-decoration: underline;
   }
+
+  .divider {
+    border-right: 1px solid #333;
+    height: 1.5rem;
+  }
 </style>
 
 <svelte:window
@@ -76,7 +78,12 @@
         type="radio"
         bind:group={selectedButton}
         value={tool}
-    >{tool}</label>
+      >
+      {tool}
+    </label>
   {/each}
   <button on:click={expandCanvas}>Expand</button>
+  {#if yourTurn}
+
+  {/if}
 </div>
