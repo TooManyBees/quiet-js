@@ -24,3 +24,8 @@ input, button, select, textarea {
 input:disabled {
 	color: #ccc;
 }
+
+@font-face {
+	font-family: Dicier;
+	src: url("/Dicier-Round-Dark.woff2") format("woff2"), url("/Dicier-Round-Dark.woff") format("woff");
+}

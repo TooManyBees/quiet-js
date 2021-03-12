@@ -106,6 +106,11 @@
 	.current .name {
 		color: white;
 	}
+
+	.drawn-card {
+		font-family: Dicier;
+		font-variant-ligatures: discretionary-ligatures;
+	}
 </style>
 
 <div class="wrapper" class:empty={users.length === 0}>
