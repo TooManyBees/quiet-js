@@ -1,5 +1,6 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from "svelte";
+  import Project from "./Project.svelte";
   import pointerEvents from "./pointer-events.js";
 
   const EXPANSION = 256;
@@ -7,6 +8,7 @@
   export let width = 256;
   export let height = 256;
   export let tool;
+  export let projects = [];
 
   let canvas;
   let context;
@@ -30,6 +32,9 @@
       break;
     case "pan":
       cursor = "grab";
+      break;
+    default:
+      cursor = "default";
       break;
   }
 
@@ -152,6 +157,12 @@
     zoom = zoom / 1.5;
   }
 
+  function handlePlaceProject(event) {
+    const x = event.detail.x - canvas.width / 2;
+    const y = event.detail.y - canvas.height / 2;
+    dispatch("place-project", { ...event.detail, x, y });
+  }
+
   onMount(() => {
     context = canvas.getContext("2d");
   });
@@ -162,11 +173,14 @@
 </script>
 
 <style>
+  .wrapper {
+    display: inline-flex;
+    position: relative;
+    transform: translate(-50%, -50%);
+  }
   canvas {
     background-color: white;
     outline: 20px solid #eee;
-    position: relative;
-    transform: translate(-50%, -50%);
   }
 </style>
 
@@ -177,20 +191,27 @@
   on:keyup={handleKeyup}
 />
 
-<canvas
-  width={width}
-  height={height}
-  bind:this={canvas}
-  use:pointerEvents={tool}
-  on:drawline={handleDrawLine}
-  on:drawend={handleDrawEnd}
-  on:pan={handlePan}
-  on:zoom-in={handleZoomIn}
-  on:zoom-out={handleZoomOut}
+<div
+  class="wrapper"
   style={`
-    cursor: ${cursor};
     left: ${canvasX}px;
     top: ${canvasY}px;
     transform: translate(-50%, -50%) scale(${zoom});
-  `}
-></canvas>
+  `}>
+  <canvas
+    width={width}
+    height={height}
+    bind:this={canvas}
+    use:pointerEvents={tool}
+    on:drawline={handleDrawLine}
+    on:drawend={handleDrawEnd}
+    on:pan={handlePan}
+    on:zoom-in={handleZoomIn}
+    on:zoom-out={handleZoomOut}
+    on:place-project={handlePlaceProject}
+    style={`cursor: ${cursor};`}
+  ></canvas>
+  {#each projects as project}
+    <Project {...project} />
+  {/each}
+</div>

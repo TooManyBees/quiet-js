@@ -63,6 +63,12 @@ export function reducer(state, action) {
         turnNumber: state.turnNumber + 1,
       };
     }
+    case "game:place-project": {
+      return {
+        ...state,
+        projects: [...state.projects, action.payload.project],
+      };
+    }
     default: {
       return state;
     }

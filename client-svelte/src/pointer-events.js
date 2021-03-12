@@ -84,6 +84,16 @@ export default function(node, tool) {
   }
   /*----------- End zoom controls ------------*/
 
+  /*--------- Begin project controls ---------*/
+  function placeProject(e) {
+    const x = e.offsetX;
+    const y = e.offsetY;
+    node.dispatchEvent(new CustomEvent("place-project", {
+      detail: { x, y },
+    }));
+  }
+  /*---------- End project controls ----------*/
+
   function onpointerdown(e) {
     switch (tool) {
     case "draw":
@@ -92,6 +102,8 @@ export default function(node, tool) {
       return zoom(e);
     case "pan":
       return panstart(e);
+    case "project":
+      return placeProject(e);
     }
   }
 

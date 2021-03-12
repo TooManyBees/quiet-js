@@ -6,6 +6,7 @@
 	import Canvas from "./Canvas.svelte";
 	import Modal from "./Modal.svelte";
 	import StartGame from "./Modal/StartGame.svelte";
+	import PlacingProject from "./Modal/PlacingProject.svelte";
 	import Tools from "./Tools.svelte";
 	import Users from "./Users.svelte";
 
@@ -31,6 +32,21 @@
 	$: currentId = $userIds[state.turnNumber % $userIds.length];
 	$: yourTurn = $userId === currentId;
 	$: drawn = state.yourTurn && state.yourTurn.drawn;
+
+	let pendingProject = null;
+
+	function initiatePlaceProject(e) {
+		pendingProject = e.detail;
+	}
+
+	function placeProject(e) {
+		pendingProject = null;
+		state = reducer(state, {
+			type: "game:place-project", payload: {
+				project: e.detail,
+			},
+		});
+	}
 
 	function initiateStartGame() {
 		state = reducer(state, { type: "game:initiate-start" });
@@ -130,7 +146,9 @@
 		height={256}
 		bind:this={canvas}
 		on:drawmulti={handleDrawMulti}
+		on:place-project={initiatePlaceProject}
 		tool={selectedTool}
+		projects={state.projects}
 	/>
 	<div class="wrapper">
 		<Tools
@@ -150,10 +168,19 @@
 			on:pass-turn={passTurn}
 		/>
 	</div>
-	{#if state.phase === "starting"}
-		<Modal>
-			<StartGame on:start-game={startGame} />
-		</Modal>
+	{#if yourTurn}
+		{#if state.phase === "starting"}
+			<Modal>
+				<StartGame on:start-game={startGame} />
+			</Modal>
+		{:else if pendingProject}
+			<Modal>
+				<PlacingProject
+					project={pendingProject}
+					on:place-project={placeProject}
+				/>
+			</Modal>
+		{/if}
 	{/if}
 </main>
 

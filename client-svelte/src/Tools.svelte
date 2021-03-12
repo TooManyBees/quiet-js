@@ -2,7 +2,7 @@
   import { createEventDispatcher } from "svelte";
   export let selected = "draw";
   export let yourTurn;
-  const tools = ["draw", "zoom", "pan"];
+  const tools = ["draw", "zoom", "pan", "project"];
   let selectedButton = "draw";
   let selectedOverride = null;
   $: {
@@ -17,14 +17,12 @@
 
   function handleKeydown(e) {
     if (event.key === " ") {
-      e.preventDefault();
       selectedOverride = "pan";
     }
   }
 
   function handleKeyup(e) {
     if (event.key === " ") {
-      e.preventDefault();
       selectedOverride = null;
     }
   }
