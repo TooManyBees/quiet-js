@@ -13,6 +13,7 @@ app.use(express.static(path.join(__dirname, "..", "client")));
 app.use(express.json());
 app.locals.rooms = new Map();
 app.locals.clients = new Map();
+app.locals.pendingCanvasRelays = new Map();
 
 function auth(req, res, next) {
   let token = req.headers.authorization
@@ -35,6 +36,38 @@ function auth(req, res, next) {
 app.get("/", (req, res) => {
   const slug = niceware.generatePassphrase(10).join("-");
   res.redirect(`/${slug}`);
+});
+
+app.get("/api/relay/canvas-data", auth, (req, res) => {
+  const userId = req.user.id;
+  const { rooms, clients, pendingCanvasRelays } = app.locals;
+
+  const existingResponse = pendingCanvasRelays.get(userId);
+  if (existingResponse) {
+    // FIXME: correct for abruptly closing connection?
+    existingResponse.end();
+  }
+  const room = rooms.get(req.user.roomId);
+  if (room && room.length > 1) {
+    // TODO: pick random peer rather than first;
+    const peerId = room.filter(peerId => peerId !== userId)[0];
+    const peer = clients.get(peerId);
+    peer.emit("send-canvas-data", userId);
+  }
+  pendingCanvasRelays.set(userId, res);
+});
+
+app.post("/api/relay/:peerId/canvas-data", auth, (req, res) => {
+  const peerId = req.params.peerId;
+  const pendingResponse = app.locals.pendingCanvasRelays.get(peerId);
+  if (pendingResponse) {
+    pendingResponse.status(200);
+    pendingResponse.set("Content-Type", "application/octet-stream")
+    req.pipe(pendingResponse);
+    res.sendStatus(204);
+  } else {
+    res.sendStatus(404);
+  }
 });
 
 app.post("/api/relay/:peerId/:event", auth, (req, res) => {

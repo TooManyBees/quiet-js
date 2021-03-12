@@ -1,8 +1,16 @@
 <script>
 	import { onMount } from "svelte";
-	import { connect, userId, userIds, sendMessage, broadcast } from "./connection.js";
+	import {
+		connect,
+		userId,
+		userIds,
+		sendMessage,
+		broadcast,
+		requestCanvas,
+		sendCanvas,
+	} from "./connection.js";
 	import { getUserName, setUserName } from "./storage.js";
-	import { initialState, reducer } from "./reducer.js";
+	import { initialState, reducer, withoutYourTurn } from "./reducer.js";
 	import Canvas from "./Canvas.svelte";
 	import Modal from "./Modal.svelte";
 	import StartGame from "./Modal/StartGame.svelte";
@@ -84,13 +92,15 @@
 	}
 
 	function expandCanvas() {
-		canvas.expand();
+		const { width, height } = canvas.expand();
+		state = reducer(state, { type: "canvas:expand", payload: { width, height }})
 		broadcast({ type: "expand-canvas" });
 	}
 
 	function onPeerData(peerId, data) {
 		switch (data.type) {
 		case "introduce-yourself":
+			needHistory = false;
 			sendMessage(peerId, { type: "change-name", name: userName });
 			break;
 		case "new-connection":
@@ -106,24 +116,37 @@
 		case "drawmulti":
 			canvas.draw(data.points);
 			break;
-		case "receive-history":
-			if (needHistory) {
-				canvas.setState(data.canvas);
-				needHistory = false;
-			}
-			break;
 		case "request-history":
+			sendMessage(peerId, {
+				type: "update-state",
+				state: withoutYourTurn(state),
+				theStoryThusFar: true,
+			});
+			break;
+		case "send-canvas-data":
 			const canvasState = canvas.getState();
-			sendMessage(peerId, { type: "receive-history", canvas: canvasState });
+			sendCanvas(peerId, canvasState.bytes);
 			break;
 		case "change-name":
 			changeName(peerId, data.name);
 			break;
-		case "expand-canvas":
-			canvas.expand();
+		case "expand-canvas": {
+			const { width, height } = canvas.expand();
+			state = reducer(state, { type: "canvas:expand", payload: { width, height }});
 			break;
+		}
 		case "update-state":
 			state = data.state;
+			if (needHistory) {
+				requestCanvas(peerId).then(bytes => {
+					canvas.setBytes(
+						state.canvasSize.width,
+						state.canvasSize.height,
+						bytes,
+					);
+				});
+			}
+			needHistory = false;
 			break;
 		default:
 			console.log(`Unkonwn message from ${peerId}: ${data.type}`);

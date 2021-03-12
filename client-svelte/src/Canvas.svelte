@@ -64,16 +64,18 @@
     return {
       width: imageData.width,
       height: imageData.height,
-      bytes: isEmpty ? [] : Array.from(imageData.data),
+      bytes: isEmpty ? new Uint8ClampedArray : imageData.data,
     };
   }
 
-  export function setState(state) {
-    const { width, height, bytes } = state;
-    canvas.width = width;
-    canvas.height = height;
-    if (bytes.length > 0) {
-      const imageData = new ImageData(Uint8ClampedArray.from(bytes), width, height);
+  export function setBytes(width, height, bytes) {
+    if (bytes.byteLength > 0) {
+      const expectedByteLength = canvas.width * canvas.height * 4;
+      if (expectedByteLength !== bytes.byteLength) {
+        canvas.width = width;
+        canvas.height = height;
+      }
+      const imageData = new ImageData(new Uint8ClampedArray(bytes), canvas.width, canvas.height);
       context.putImageData(imageData, 0, 0);
     }
   }
@@ -90,6 +92,7 @@
     canvas.height = height;
     context.clearRect(0, 0, canvas.width, canvas.height);
     context.putImageData(imageData, marginX, marginY);
+    return { width, height };
   }
 
   function flushQueue(end) {

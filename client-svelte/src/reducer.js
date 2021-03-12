@@ -12,10 +12,17 @@ export function initialState() {
     projects: [],
     contempt: {},
     canvasSize: {
-      x: 256,
-      y: 256,
+      width: 256,
+      height: 256,
     },
     history: [],
+  };
+}
+
+export function withoutYourTurn(state) {
+  return {
+    ...state,
+    yourTurn: null,
   };
 }
 
@@ -67,6 +74,12 @@ export function reducer(state, action) {
       return {
         ...state,
         projects: [...state.projects, action.payload.project],
+      };
+    }
+    case "canvas:expand": {
+      return {
+        ...state,
+        canvasSize: action.payload,
       };
     }
     default: {

@@ -155,6 +155,26 @@ async function createOffer(peerId, peer) {
   await relay(peerId, "session-description", offer);
 }
 
+export async function requestCanvas() {
+  const response = await fetch("/api/relay/canvas-data", {
+    headers: {
+      "Authorization": `Bearer ${token}`,
+    },
+  })
+  const body = await response.arrayBuffer();
+  return body;
+}
+
+export function sendCanvas(id, body) {
+  return fetch(`/api/relay/${id}/canvas-data`, {
+    method: "POST",
+    headers: {
+      "Authorization": `Bearer ${token}`,
+    },
+    body,
+  });
+}
+
 export async function connect(onPeerData) {
   await getToken();
 
@@ -164,4 +184,7 @@ export async function connect(onPeerData) {
   eventSource.addEventListener("session-description", sessionDescription, false);
   eventSource.addEventListener("ice-candidate", iceCandidate, false);
   eventSource.addEventListener("connected", () => join(), false);
+  eventSource.addEventListener("send-canvas-data", (message) => {
+    onPeerData(JSON.parse(message.data), { type: "send-canvas-data" });
+  });
 }
