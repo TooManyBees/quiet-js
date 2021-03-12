@@ -100,6 +100,7 @@
 		switch (data.type) {
 		case "introduce-yourself":
 			sendMessage(peerId, { type: "change-name", name: userName });
+			break;
 		case "new-connection":
 			if (needHistory) {
 				sendMessage(peerId, { type: "request-history" });
