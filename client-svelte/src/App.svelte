@@ -88,15 +88,7 @@
 		broadcast({ type: "expand-canvas" });
 	}
 
-	function onPeerData(peerId, buffer) {
-		let data;
-		try {
-			data = JSON.parse(buffer);
-			console.log(data);
-		} catch (e) {
-			console.error(`Error parsing JSON`, buffer);
-		}
-
+	function onPeerData(peerId, data) {
 		switch (data.type) {
 		case "introduce-yourself":
 			sendMessage(peerId, { type: "change-name", name: userName });

@@ -37,7 +37,7 @@ app.get("/", (req, res) => {
   res.redirect(`/${slug}`);
 });
 
-app.post("/relay/:peerId/:event", auth, (req, res) => {
+app.post("/api/relay/:peerId/:event", auth, (req, res) => {
   const peerId = req.params.peerId;
   const clients = app.locals.clients;
   const client = clients.get(peerId);
@@ -47,7 +47,7 @@ app.post("/relay/:peerId/:event", auth, (req, res) => {
   res.sendStatus(200);
 });
 
-app.post("/access", (req, res) => {
+app.post("/api/access", (req, res) => {
   if (!req.body.roomId) {
     return res.sendStatus(400);
   }
@@ -78,7 +78,7 @@ function disconnected(user) {
   }
 }
 
-app.get("/connect", auth, (req, res) => {
+app.get("/api/connect", auth, (req, res) => {
   if (req.headers.accept !== "text/event-stream") {
     return res.status(405);
   }
@@ -103,11 +103,11 @@ app.get("/connect", auth, (req, res) => {
   req.on("close", () => disconnected(req.user));
 });
 
-app.get("/:roomId", (req, res) => {
+app.get("/api/:roomId", (req, res) => {
   res.sendFile(path.join(__dirname, "..", "client", "index.html"));
 });
 
-app.post("/:roomId/join", auth, (req, res) => {
+app.post("/api/:roomId/join", auth, (req, res) => {
   // TODO: check that req.params.roomId === req.user.roomId
   const roomId = req.params.roomId;
   const { clients, rooms } = app.locals;

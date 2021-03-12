@@ -14,7 +14,7 @@ const userIdsWritable = writable([]);
 export const userIds = derived(userIdsWritable, l => l);
 
 async function getToken() {
-  let res = await fetch("http://localhost:8888/access", {
+  let res = await fetch("/api/access", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -27,7 +27,7 @@ async function getToken() {
 }
 
 function join() {
-  return fetch(`http://localhost:8888/${roomId}/join`, {
+  return fetch(`/api/${roomId}/join`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -45,12 +45,21 @@ const rtcConfig = {
   }],
 };
 
-let needHistory = true;
-
 function addPeer(data, onPeerData) {
   const message = JSON.parse(data.data);
   if (get(peersWritable)[message.peer.id]) {
     return;
+  }
+
+  function onRawPeerData(peerId, buffer) {
+    let data;
+    try {
+      data = JSON.parse(buffer);
+      console.log("receive", data);
+    } catch (e) {
+      console.error(`Error parsing JSON`, buffer);
+    }
+    return onPeerData(peerId, data);
   }
 
   const peer = new RTCPeerConnection(rtcConfig);
@@ -68,11 +77,11 @@ function addPeer(data, onPeerData) {
   if (message.offer) { // If client running this JS is new
     const channel = peer.createDataChannel("updates");
     channel.onmessage = function(event) {
-      onPeerData(message.peer.id, event.data);
+      onRawPeerData(message.peer.id, event.data);
     };
     channel.onopen = function() {
       userIdsWritable.set(message.userIds);
-      onPeerData(message.peer.id, JSON.stringify({ type: "new-connection" }));
+      onPeerData(message.peer.id, { type: "new-connection" });
     };
     channels[message.peer.id] = channel;
     createOffer(message.peer.id, peer);
@@ -80,10 +89,10 @@ function addPeer(data, onPeerData) {
     peer.ondatachannel = function(event) {
       channels[message.peer.id] = event.channel;
       event.channel.onmessage = function(evt) {
-        onPeerData(message.peer.id, evt.data);
+        onRawPeerData(message.peer.id, evt.data);
       };
       userIdsWritable.set(message.userIds);
-      onPeerData(message.peer.id, JSON.stringify({ type: "introduce-yourself" }));
+      onPeerData(message.peer.id, { type: "introduce-yourself" });
     };
   }
 }
@@ -130,7 +139,7 @@ export function sendMessage(peerId, data) {
 }
 
 async function relay(peerId, event, data) {
-  await fetch(`http://localhost:8888/relay/${peerId}/${event}`, {
+  await fetch(`/api/relay/${peerId}/${event}`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -149,7 +158,7 @@ async function createOffer(peerId, peer) {
 export async function connect(onPeerData) {
   await getToken();
 
-  eventSource = new EventSource(`http://localhost:8888/connect?token=${token}`);
+  eventSource = new EventSource(`/api/connect?token=${token}`);
   eventSource.addEventListener("add-peer", (peer) => addPeer(peer, onPeerData), false);
   eventSource.addEventListener("remove-peer", removePeer, false);
   eventSource.addEventListener("session-description", sessionDescription, false);
