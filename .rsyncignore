@@ -1,0 +1,12 @@
+*.pid
+*.sock
+.git
+*.log
+node_modules
+.DS_Store
+.gitignore
+.rsyncignore
+.login
+sync
+client
+public/build

@@ -1,0 +1,10 @@
+if [[ -n $TMB_PORT && -n $TMB_IP ]]; then
+  rsync -avzk -e "ssh -p $TMB_PORT" --delete --exclude-from '.rsyncignore' --progress $(pwd)/ "queen@$TMB_IP:/usr/local/quiet/"
+else
+  if [[ -z $TMB_PORT ]]; then
+    echo "SSH port for toomanybees not defined (source login?)"
+  fi
+  if [[ -z $TMB_IP ]]; then
+    echo "IP for toomanybees not defined (source login?)"
+  fi
+fi
