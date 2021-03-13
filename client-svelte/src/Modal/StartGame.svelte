@@ -8,6 +8,7 @@
 <div class="choices">
   <button on:click={() => dispatch("start-game", { fleeting: false })}>52 turns</button>
   <button on:click={() => dispatch("start-game", { fleeting: true })}>36 turns</button>
+  <button on:click={() => dispatch("cancel")}>Cancel</button>
 </div>
 
 <style>

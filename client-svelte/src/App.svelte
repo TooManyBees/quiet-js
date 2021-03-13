@@ -202,7 +202,10 @@
 	</div>
 	{#if state.phase === "starting"}
 		<Modal>
-			<StartGame on:start-game={startGame} />
+			<StartGame
+				on:start-game={startGame}
+				on:cancel={() => state = reducer(state, { type: "game:cancel-start" })}
+			/>
 		</Modal>
 	{:else if pendingProject}
 		<Modal>

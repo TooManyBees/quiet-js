@@ -32,7 +32,13 @@ export function reducer(state, action) {
       return {
         ...state,
         phase: "starting",
-      }
+      };
+    }
+    case "game:cancel-start": {
+      return {
+        ...state,
+        phase: "pregame",
+      };
     }
     case "game:start": {
       const { fleeting, startingTurn } = action.payload;
