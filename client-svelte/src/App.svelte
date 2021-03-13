@@ -118,6 +118,7 @@
 	}
 
 	function onPeerData(peerId, data) {
+		console.debug("recv", data);
 		switch (data.type) {
 		case "introduce-yourself":
 			needHistory = false;

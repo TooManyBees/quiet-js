@@ -61,7 +61,6 @@ function addPeer(event, onPeerData) {
     let data;
     try {
       data = JSON.parse(buffer);
-      console.log("receive", data);
     } catch (e) {
       console.error(`Error parsing JSON`, buffer);
     }
@@ -142,6 +141,7 @@ export function broadcast(data) {
 }
 
 export function sendMessage(peerId, data) {
+  console.debug("send", data);
   channels[peerId].send(JSON.stringify(data));
 }
 
