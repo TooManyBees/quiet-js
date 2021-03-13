@@ -51,8 +51,8 @@ const rtcConfig = {
   }],
 };
 
-function addPeer(data, onPeerData) {
-  const message = JSON.parse(data.data);
+function addPeer(event, onPeerData) {
+  const message = JSON.parse(event.data);
   if (get(peersWritable)[message.peer.id]) {
     return;
   }
@@ -189,12 +189,12 @@ export async function connect(onPeerData) {
   await getToken();
 
   eventSource = new EventSource(`/api/connect?token=${token}`);
-  eventSource.addEventListener("add-peer", (peer) => addPeer(peer, onPeerData), false);
+  eventSource.addEventListener("add-peer", (event) => addPeer(event, onPeerData), false);
   eventSource.addEventListener("remove-peer", removePeer, false);
   eventSource.addEventListener("session-description", sessionDescription, false);
   eventSource.addEventListener("ice-candidate", iceCandidate, false);
   eventSource.addEventListener("connected", () => join(), false);
-  eventSource.addEventListener("send-canvas-data", (message) => {
-    onPeerData(JSON.parse(message.data), { type: "send-canvas-data" });
+  eventSource.addEventListener("send-canvas-data", (event) => {
+    onPeerData(JSON.parse(event.data), { type: "send-canvas-data" });
   });
 }
