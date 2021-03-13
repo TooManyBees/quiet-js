@@ -3,6 +3,7 @@ const http = require("http");
 const uuid = require("uuid");
 const niceware = require("niceware");
 const path = require("path");
+const fs = require("fs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 
@@ -186,4 +187,17 @@ app.post("/api/:roomId/join", auth, (req, res) => {
 
 const server = http.createServer(app);
 
-server.listen(8888, () => console.log("server started"));
+const dest = {
+  path: path.join(__dirname, "sockets", "quiet.sock"),
+  writableAll: true,
+};
+
+function close() {
+  server.close();
+  process.exit();
+}
+
+process.on("SIGINT", close);
+process.on("SIGTERM", close);
+
+server.listen(dest, () => console.log(`server started on ${dest.path}`));
