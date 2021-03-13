@@ -4,7 +4,10 @@ export function initialState() {
   return {
     phase: "pregame",
     deck: null,
-    yourTurn: null,
+    yourTurn: {
+      drawn: 0,
+      numberOfProjects: 0,
+    },
     turnNumber: 0,
     resources: [],
     abundancies: [],
@@ -16,13 +19,6 @@ export function initialState() {
       height: 256,
     },
     history: [],
-  };
-}
-
-export function withoutYourTurn(state) {
-  return {
-    ...state,
-    yourTurn: null,
   };
 }
 
@@ -49,15 +45,6 @@ export function reducer(state, action) {
         turnNumber: startingTurn || 0,
       };
     }
-    case "game:begin-your-turn": {
-      return {
-        ...state,
-        yourTurn: {
-          drawn: null,
-          numberOfProjects: state.projects.length,
-        },
-      };
-    }
     case "game:draw-card": {
       const drawn = state.deck[0];
       const deck = state.deck.slice(1);
@@ -73,8 +60,34 @@ export function reducer(state, action) {
     case "game:next-turn": {
       return {
         ...state,
-        yourTurn: null,
         turnNumber: state.turnNumber + 1,
+      };
+    }
+    case "game:end-turn": {
+      const { drawn, numberOfProjects } = state.yourTurn;
+      let projects = state.projects;
+      if (drawn) {
+        projects = [
+          ...projects.slice(0, numberOfProjects).map(p => ({
+            ...p,
+            weeks: Math.max(0, p.weeks - 1),
+          })),
+          ...projects.slice(numberOfProjects),
+        ];
+      }
+      const history = drawn
+        ? [drawn, ...state.history]
+        : state.history;
+
+      return {
+        ...state,
+        yourTurn: {
+          drawn: null,
+          numberOfProjects: projects.length,
+        },
+        turnNumber: state.turnNumber + 1,
+        projects,
+        history,
       };
     }
     case "game:place-project": {

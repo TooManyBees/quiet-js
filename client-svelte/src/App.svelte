@@ -10,7 +10,7 @@
 		sendCanvas,
 	} from "./connection.js";
 	import { getUserName, setUserName } from "./storage.js";
-	import { initialState, reducer, withoutYourTurn } from "./reducer.js";
+	import { initialState, reducer } from "./reducer.js";
 	import Canvas from "./Canvas.svelte";
 	import Modal from "./Modal.svelte";
 	import StartGame from "./Modal/StartGame.svelte";
@@ -39,7 +39,7 @@
 	let selectedTool = "draw";
 	$: currentId = $userIds[state.turnNumber % $userIds.length];
 	$: yourTurn = $userId === currentId;
-	$: drawn = state.yourTurn && state.yourTurn.drawn;
+	$: drawn = state.yourTurn.drawn;
 
 	let pendingProject = null;
 
@@ -83,7 +83,12 @@
 		state = reducer(state, { type: "game:draw-card" });
 	}
 
-	function passTurn() {
+	function passYourTurn() {
+		state = reducer(state, { type: "game:end-turn" });
+		broadcast({ type: "update-state", state });
+	}
+
+	function passOthersTurn() {
 		state = reducer(state, { type: "game:next-turn" });
 		broadcast({ type: "update-state", state });
 	}
@@ -132,7 +137,7 @@
 		case "request-history":
 			sendMessage(peerId, {
 				type: "update-state",
-				state: withoutYourTurn(state),
+				state,
 				theStoryThusFar: true,
 			});
 			break;
@@ -197,7 +202,8 @@
 			on:change-name={(event) => changeMyName(event.detail.name)}
 			on:start-game={initiateStartGame}
 			on:draw-card={drawCard}
-			on:pass-turn={passTurn}
+			on:pass-turn={passYourTurn}
+			on:pass-others-turn={passOthersTurn}
 		/>
 	</div>
 	{#if state.phase === "starting"}

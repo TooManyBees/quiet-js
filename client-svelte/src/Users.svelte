@@ -21,6 +21,10 @@
 		dispatch("start-game", { startingTurn });
 	}
 
+	function passTurn() {
+		dispatch(yourTurn ? "pass-turn" : "pass-others-turn");
+	}
+
 	function handleStartEditing(event) {
 		newUserName = userName;
 		editing = true;
@@ -159,7 +163,7 @@
 						<span class="drawn-card">{drawn}</span>
 					{/if}
 				{/if}
-				<button on:click={() => dispatch("pass-turn")}>Pass Turn</button>
+				<button on:click={passTurn}>Pass Turn</button>
 			{/if}
 		{/if}
 	</div>
