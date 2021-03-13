@@ -69,12 +69,14 @@
   }
 
   export function setBytes(width, height, bytes) {
+    canvas.width = width;
+    canvas.height = height;
     if (bytes.byteLength > 0) {
-      const expectedByteLength = canvas.width * canvas.height * 4;
-      if (expectedByteLength !== bytes.byteLength) {
-        canvas.width = width;
-        canvas.height = height;
-      }
+      // const expectedByteLength = canvas.width * canvas.height * 4;
+      // if (expectedByteLength !== bytes.byteLength) {
+      //   canvas.width = width;
+      //   canvas.height = height;
+      // }
       const imageData = new ImageData(new Uint8ClampedArray(bytes), canvas.width, canvas.height);
       context.putImageData(imageData, 0, 0);
     }

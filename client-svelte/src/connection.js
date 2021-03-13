@@ -106,6 +106,7 @@ function removePeer(data) {
       return peers;
     });
   }
+  delete channels[message.peerId];
   userIdsWritable.set(message.userIds);
 }
 
