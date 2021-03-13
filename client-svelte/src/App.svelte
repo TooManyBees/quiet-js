@@ -12,6 +12,7 @@
 	import { getUserName, setUserName } from "./storage.js";
 	import { initialState, reducer } from "./reducer.js";
 	import Canvas from "./Canvas.svelte";
+	import Info from "./Info.svelte";
 	import Modal from "./Modal.svelte";
 	import StartGame from "./Modal/StartGame.svelte";
 	import PlacingProject from "./Modal/PlacingProject.svelte";
@@ -37,6 +38,7 @@
 	let needHistory = true;
 	let canvas;
 	let selectedTool = "draw";
+	let showInfo = false;
 	$: currentId = $userIds[state.turnNumber % $userIds.length];
 	$: yourTurn = $userId === currentId;
 	$: drawn = state.yourTurn.drawn;
@@ -191,7 +193,6 @@
 		<Tools
 			bind:selected={selectedTool}
 			on:expand-canvas={expandCanvas}
-			yourTurn={yourTurn}
 		/>
 		<Users
 			selfId={$userId}
@@ -222,6 +223,7 @@
 			/>
 		</Modal>
 	{/if}
+	<Info bind:visible={showInfo} />
 </main>
 
 <style>

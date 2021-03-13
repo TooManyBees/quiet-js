@@ -1,7 +1,6 @@
 <script>
   import { createEventDispatcher } from "svelte";
   export let selected = "draw";
-  export let yourTurn;
   const tools = ["draw", "zoom", "pan", "project"];
   let selectedButton = "draw";
   let selectedOverride = null;
@@ -56,11 +55,6 @@
 
   .selected {
     text-decoration: underline;
-  }
-
-  .divider {
-    border-right: 1px solid #333;
-    height: 1.5rem;
   }
 </style>
 
