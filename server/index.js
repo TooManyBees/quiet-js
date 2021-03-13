@@ -15,6 +15,10 @@ app.locals.rooms = new Map();
 app.locals.clients = new Map();
 app.locals.pendingCanvasRelays = new Map();
 
+function activeUsers(room) {
+  return room.filter(id => app.locals.clients.has(id));
+}
+
 function auth(req, res, next) {
   let token = req.headers.authorization
     ? req.headers.authorization.split(" ")[1]
@@ -52,7 +56,7 @@ app.get("/api/relay/canvas-data", auth, (req, res) => {
     // TODO: pick random peer rather than first;
     const peerId = room.filter(peerId => peerId !== userId)[0];
     const peer = clients.get(peerId);
-    peer.emit("send-canvas-data", userId);
+    peer && peer.emit("send-canvas-data", userId);
   }
   pendingCanvasRelays.set(userId, res);
 });
@@ -98,15 +102,20 @@ function disconnected(user) {
   console.log(`disconnecting ${user.id}`);
   clients.delete(user.id);
 
+  // Intentionally keep userIds in the room when disconnecting
+  // (only discard the corresponding `client`) so that when the
+  // same user rejoins, they remain in the same spot.
+
   const room = rooms.get(user.roomId);
   if (room && room.includes(user.id)) {
-    room.splice(room.indexOf(user.id), 1);
     for (const peerId of room) {
+      if (peerId === user.id) continue;
       const peer = clients.get(peerId);
-      peer && peer.emit("remove-peer", { peerId: user.id, userIds: room });
+      peer && peer.emit("remove-peer", { peerId: user.id, userIds: activeUsers(room) });
     }
-    if (room.size === 0) {
-      rooms.delete(roomId);
+    if (!room.some(userId => clients.has(userId))) {
+      console.log(`deleting room ${user.roomId}`);
+      rooms.delete(user.roomId);
     }
   }
 }
@@ -136,28 +145,24 @@ app.get("/api/connect", auth, (req, res) => {
   req.on("close", () => disconnected(req.user));
 });
 
-app.get("/api/:roomId", (req, res) => {
-  res.sendFile(path.join(__dirname, "..", "client", "index.html"));
-});
-
 app.post("/api/:roomId/join", auth, (req, res) => {
   // TODO: check that req.params.roomId === req.user.roomId
   const roomId = req.params.roomId;
   const { clients, rooms } = app.locals;
   let room = rooms.get(roomId);
 
-  if (room && room.includes(req.user.id)) {
-    return res.sendStatus(204);
-  }
-
   if (!room) {
     room = [];
     rooms.set(roomId, room);
   }
 
-  room.push(req.user.id);
+  if (!room.includes(req.user.id)) {
+    room.push(req.user.id);
+  }
 
   console.log(`user joining room ${roomId}: ${req.user.id}`);
+
+  const userIds = activeUsers(room);
 
   for (const peerId of room) {
     if (peerId === req.user.id) continue;
@@ -165,13 +170,13 @@ app.post("/api/:roomId/join", auth, (req, res) => {
       clients.get(peerId).emit("add-peer", {
         peer: req.user,
         offer: false,
-        userIds: room,
+        userIds,
       });
       clients.get(req.user.id).emit("add-peer", {
         peer: clients.get(peerId).user,
         roomId,
         offer: true,
-        userIds: room,
+        userIds,
       });
     }
   }

@@ -19,7 +19,7 @@ export function setUserName(name) {
 
 export function getSessionToken() {
   try {
-    return sessionStorage.get(`token-${roomId}`);
+    return JSON.parse(sessionStorage.getItem(`token-${roomId}`));
   } catch (e) {
     console.warn("Couldn't fetch session token from sessionStorage.");
     return null;
@@ -28,7 +28,7 @@ export function getSessionToken() {
 
 export function setSessionToken(token) {
   try {
-    sessionStorage.setItem(`token-${roomId}`);
+    sessionStorage.setItem(`token-${roomId}`, JSON.stringify(token));
   } catch (e) {
     console.warn("Couldn't set session token to sessionStorage.");
   }

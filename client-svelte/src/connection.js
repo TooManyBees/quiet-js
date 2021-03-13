@@ -1,4 +1,5 @@
 import { readable, writable, derived, get } from "svelte/store";
+import { getSessionToken, setSessionToken } from "./storage.js";
 import pako from "pako";
 
 // const roomId = window.location.pathname.substr(1);
@@ -15,14 +16,18 @@ const userIdsWritable = writable([]);
 export const userIds = derived(userIdsWritable, l => l);
 
 async function getToken() {
-  let res = await fetch("/api/access", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ roomId }),
-  });
-  const data = await res.json();
+  let data = getSessionToken();
+  if (!data) {
+    const res = await fetch("/api/access", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({ roomId }),
+    });
+    data = await res.json();
+    setSessionToken(data);
+  }
   token = data.token;
   userIdWritable.set(data.userId);
 }
