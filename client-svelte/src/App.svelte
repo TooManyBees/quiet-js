@@ -53,6 +53,10 @@
 		broadcast({ type: "place-project", project: e.detail });
 	}
 
+	function cancelPlaceProject() {
+		pendingProject = null;
+	}
+
 	function placeProject(project) {
 		state = reducer(state, {
 			type: "game:place-project", payload: { project },
@@ -200,6 +204,7 @@
 				<PlacingProject
 					project={pendingProject}
 					on:place-project={finishPlaceProject}
+					on:cancel={cancelPlaceProject}
 				/>
 			</Modal>
 		{/if}

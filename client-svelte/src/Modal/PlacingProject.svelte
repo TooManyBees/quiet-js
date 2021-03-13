@@ -17,9 +17,18 @@
       y: project.y,
     });
   }
+
+  function cancel(event) {
+    event.preventDefault();
+    dispatch("cancel");
+  }
 </script>
 
 <style>
+  h2 {
+    margin: 0 0 0.5rem 0;
+  }
+
   input[type="radio"] {
     display: none;
   }
@@ -27,6 +36,26 @@
   .week-selector {
     font-family: Dicier;
     font-variant-ligatures: discretionary-ligatures;
+    font-size: 2rem;
+    line-height: 2.5rem;
+    margin-bottom: 1rem;
+    display: flex;
+    align-items: center;
+  }
+
+  .week-selector label {
+    cursor: pointer;
+    transition: font-size 0.25s;
+    margin-right: 0.5rem;
+  }
+
+  .week-selector label.selected {
+    font-size: 2.5rem;
+  }
+
+  .description {
+    width: 100%;
+    display: block;
   }
 </style>
 
@@ -40,6 +69,12 @@
       </label>
     {/each}
   </div>
-  <input type="text" bind:value={description}>
-  <input type="submit">
+  <input
+    class="description"
+    type="text"
+    placeholder="Description"
+    bind:value={description}
+  >
+  <input type="submit" value="Place Project">
+  <button on:click={cancel}>Cancel</button>
 </form>
