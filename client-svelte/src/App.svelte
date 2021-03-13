@@ -63,13 +63,19 @@
 		});
 	}
 
-	function initiateStartGame() {
+	let startingTurn = 0;
+
+	function initiateStartGame(event) {
+		startingTurn = event.detail.startingTurn;
 		state = reducer(state, { type: "game:initiate-start" });
 	}
 
 	function startGame(event) {
 		const fleeting = !!event.detail.fleeting;
-		state = reducer(state, { type: "game:start", payload: { fleeting } });
+		state = reducer(state, { type: "game:start", payload: {
+			fleeting,
+			startingTurn,
+		}});
 		broadcast({ type: "update-state", state });
 	}
 
@@ -194,20 +200,18 @@
 			on:pass-turn={passTurn}
 		/>
 	</div>
-	{#if yourTurn}
-		{#if state.phase === "starting"}
-			<Modal>
-				<StartGame on:start-game={startGame} />
-			</Modal>
-		{:else if pendingProject}
-			<Modal>
-				<PlacingProject
-					project={pendingProject}
-					on:place-project={finishPlaceProject}
-					on:cancel={cancelPlaceProject}
-				/>
-			</Modal>
-		{/if}
+	{#if state.phase === "starting"}
+		<Modal>
+			<StartGame on:start-game={startGame} />
+		</Modal>
+	{:else if pendingProject}
+		<Modal>
+			<PlacingProject
+				project={pendingProject}
+				on:place-project={finishPlaceProject}
+				on:cancel={cancelPlaceProject}
+			/>
+		</Modal>
 	{/if}
 </main>
 

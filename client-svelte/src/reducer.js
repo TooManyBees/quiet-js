@@ -35,11 +35,12 @@ export function reducer(state, action) {
       }
     }
     case "game:start": {
-      const fleeting = action.payload.fleeting;
+      const { fleeting, startingTurn } = action.payload;
       return {
         ...state,
         phase: "started",
         deck: newDeck(fleeting),
+        turnNumber: startingTurn || 0,
       };
     }
     case "game:begin-your-turn": {

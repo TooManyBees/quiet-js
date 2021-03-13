@@ -6,6 +6,7 @@
 	export let drawn;
 	export let phase;
 	$: yourTurn = selfId === currentId;
+	$: pregame = phase !== "started";
 
 	const dispatch = createEventDispatcher();
 
@@ -14,6 +15,11 @@
 	$: userName = users.find(u => u.id === selfId)?.name;
 	let newUserName;
 	let input;
+
+	function startGame() {
+		const startingTurn = users.findIndex(u => u.id === selfId) || 0;
+		dispatch("start-game", { startingTurn });
+	}
 
 	function handleStartEditing(event) {
 		newUserName = userName;
@@ -116,7 +122,7 @@
 <div class="wrapper" class:empty={users.length === 0}>
 	<ol class="users-list">
 		{#each users as user (user.id)}
-			<li class:self={user.id === selfId} class:current={user.id === currentId}>
+			<li class:self={user.id === selfId} class:current={!pregame && user.id === currentId}>
 				{#if user.id === selfId}
 					{#if editing}
 						<form on:submit={handleUpdateName}>
@@ -141,19 +147,20 @@
 			</li>
 		{/each}
 	</ol>
-	{#if yourTurn}
-		<div class="controls">
-			{#if phase === "pregame"}
-				<button on:click={() => dispatch("start-game")}>Start</button>
-			{:else if phase === "starting"}
-			{:else if phase === "started"}
-				{#if !drawn}
-					<button on:click={() => dispatch("draw-card")}>Draw Card</button>
-				{:else}
-					<span class="drawn-card">{drawn}</span>
+	<div class="controls">
+		{#if phase === "pregame"}
+			<button on:click={startGame}>Start</button>
+		{:else}
+			{#if phase === "started"}
+				{#if yourTurn}
+					{#if !drawn}
+						<button on:click={() => dispatch("draw-card")}>Draw Card</button>
+					{:else}
+						<span class="drawn-card">{drawn}</span>
+					{/if}
 				{/if}
 				<button on:click={() => dispatch("pass-turn")}>Pass Turn</button>
 			{/if}
-		</div>
-	{/if}
+		{/if}
+	</div>
 </div>
