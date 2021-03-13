@@ -1,4 +1,5 @@
 import { readable, writable, derived, get } from "svelte/store";
+import pako from "pako";
 
 // const roomId = window.location.pathname.substr(1);
 const roomId = "test-room";
@@ -163,16 +164,19 @@ export async function requestCanvas() {
     },
   })
   const body = await response.arrayBuffer();
-  return body;
+  const inflated = body.byteLength > 0 ? pako.inflate(body) : body;
+  return inflated;
 }
 
-export function sendCanvas(id, body) {
+export async function sendCanvas(id, body) {
+  const deflated = body.length > 0 ? pako.deflate(body) : body;
   return fetch(`/api/relay/${id}/canvas-data`, {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${token}`,
+      "Content-Encoding": "deflate",
     },
-    body,
+    body: deflated,
   });
 }
 
