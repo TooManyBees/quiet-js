@@ -74,8 +74,5 @@
       {tool}
     </label>
   {/each}
-  <button on:click={expandCanvas}>Expand</button>
-  {#if yourTurn}
-
-  {/if}
+  <button on:click={expandCanvas}>Expand map borders</button>
 </div>
