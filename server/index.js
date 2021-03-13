@@ -6,10 +6,36 @@ const path = require("path");
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
+const pino = require("pino");
+const expressPino = require("express-pino-logger");
 
 dotenv.config();
 
+function slice(object, fields) {
+  const result = {};
+  for (field of fields) {
+    result[field] = object[field];
+  }
+  return result;
+}
+
+const logger = pino({ level: process.env.LOG_LEVEL || "info" });
+const expressLogger = expressPino({
+  logger,
+  serializers: {
+    req: (req) => ({
+      ...slice(req, ["id", "method", "url"]),
+      headers: slice(req.headers, ["content-length", "user-agent", "content-type", "referer"])
+    }),
+    res: (res) => ({
+      statusCode: res.statusCode,
+      headers: slice(res.headers, ["content-type", "content-length"]),
+    }),
+  },
+});
+
 const app = express();
+app.use(expressLogger);
 app.use(express.static(path.join(__dirname, "..", "client")));
 app.use(express.json());
 app.locals.rooms = new Map();
@@ -100,7 +126,7 @@ app.post("/api/access", (req, res) => {
 
 function disconnected(user) {
   const { clients, rooms } = app.locals;
-  console.log(`disconnecting ${user.id}`);
+  logger.debug(`disconnecting ${user.id}`);
   clients.delete(user.id);
 
   // Intentionally keep userIds in the room when disconnecting
@@ -115,7 +141,7 @@ function disconnected(user) {
       peer && peer.emit("remove-peer", { peerId: user.id, userIds: activeUsers(room) });
     }
     if (!room.some(userId => clients.has(userId))) {
-      console.log(`deleting room ${user.roomId}`);
+      logger.debug(`deleting room ${user.roomId}`);
       rooms.delete(user.roomId);
     }
   }
@@ -161,7 +187,7 @@ app.post("/api/:roomId/join", auth, (req, res) => {
     room.push(req.user.id);
   }
 
-  console.log(`user joining room ${roomId}: ${req.user.id}`);
+  logger.debug(`user joining room ${roomId}: ${req.user.id}`);
 
   const userIds = activeUsers(room);
 
@@ -200,4 +226,4 @@ function close() {
 process.on("SIGINT", close);
 process.on("SIGTERM", close);
 
-server.listen(dest, () => console.log(`server started on ${dest.path}`));
+server.listen(dest, () => logger.info(`server started on ${dest.path}`));
