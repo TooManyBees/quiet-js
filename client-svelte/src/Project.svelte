@@ -18,6 +18,10 @@
   }
   .description {
     display: none;
+    position: absolute;
+    left: 50%;
+    transform: translateX(-50%);
+    margin: 0.5rem 0 0 0;
   }
   .project:hover .description {
     display: block;

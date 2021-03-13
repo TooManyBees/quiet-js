@@ -47,12 +47,15 @@
 		pendingProject = e.detail;
 	}
 
-	function placeProject(e) {
+	function finishPlaceProject(e) {
 		pendingProject = null;
+		placeProject(e.detail);
+		broadcast({ type: "place-project", project: e.detail });
+	}
+
+	function placeProject(project) {
 		state = reducer(state, {
-			type: "game:place-project", payload: {
-				project: e.detail,
-			},
+			type: "game:place-project", payload: { project },
 		});
 	}
 
@@ -135,6 +138,9 @@
 			state = reducer(state, { type: "canvas:expand", payload: { width, height }});
 			break;
 		}
+		case "place-project":
+			placeProject(data.project);
+			break;
 		case "update-state":
 			state = data.state;
 			if (needHistory) {
@@ -193,7 +199,7 @@
 			<Modal>
 				<PlacingProject
 					project={pendingProject}
-					on:place-project={placeProject}
+					on:place-project={finishPlaceProject}
 				/>
 			</Modal>
 		{/if}
