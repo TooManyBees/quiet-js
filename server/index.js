@@ -183,6 +183,7 @@ app.get("/api/connect", auth, (req, res) => {
 app.post("/api/:roomId/join", auth, (req, res) => {
   // TODO: check that req.params.roomId === req.user.roomId
   const roomId = req.params.roomId;
+  const userId = req.user.id;
   let room = rooms.get(roomId);
 
   if (!room) {
@@ -190,8 +191,8 @@ app.post("/api/:roomId/join", auth, (req, res) => {
     rooms.set(roomId, room);
   }
 
-  if (!room.includes(req.user.id)) {
-    room.push(req.user.id);
+  if (!room.includes(userId)) {
+    room.push(userId);
   }
 
   logger.debug(`user joining room ${roomId}: ${req.user.id}`);
@@ -199,16 +200,17 @@ app.post("/api/:roomId/join", auth, (req, res) => {
   const userIds = activeUsers(room);
 
   for (const peerId of userIds) {
-    if (peerId === req.user.id) continue;
-    if (clients.has(peerId) && clients.has(req.user.id)) {
-      clients.get(peerId).emit("add-peer", {
+    if (peerId === userId) continue;
+    const peerClient = clients.get(peerId);
+    const userClient = clients.get(userId);
+    if (peerClient && userClient) {
+      peerClient.emit("add-peer", {
         peer: req.user,
         offer: false,
         userIds,
       });
-      clients.get(req.user.id).emit("add-peer", {
-        peer: clients.get(peerId).user,
-        roomId,
+      userClient.emit("add-peer", {
+        peer: peerClient.user,
         offer: true,
         userIds,
       });
