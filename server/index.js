@@ -38,7 +38,6 @@ const expressLogger = expressPino({
 
 const app = express();
 app.use(expressLogger);
-app.use(express.static(path.join(__dirname, "..", "client")));
 app.use(express.json());
 const rooms = new Map();
 const clients = new Map();
@@ -67,8 +66,11 @@ function auth(req, res, next) {
 }
 
 app.get("/", (req, res) => {
-  const slug = niceware.generatePassphrase(10).join("-");
-  res.redirect(`/${slug}`);
+  let slug;
+  while (!slug || rooms.has(slug)) {
+    slug = niceware.generatePassphrase(10).join("-");
+  }
+  res.redirect(`/room/${slug}`);
 });
 
 app.get("/api/canvas-data", auth, (req, res) => {

@@ -2,8 +2,7 @@ import { readable, writable, derived, get } from "svelte/store";
 import { getSessionToken, setSessionToken } from "./storage.js";
 import pako from "pako";
 
-// const roomId = window.location.pathname.substr(1);
-const roomId = "test-room";
+export const roomId = window.location.pathname.split("/").slice(-1)[0];
 let token = null;
 let eventSource = null;
 const channels = {};
