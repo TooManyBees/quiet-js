@@ -225,12 +225,13 @@ app.post("/api/:roomId/join", auth, (req, res) => {
 const server = http.createServer(app);
 
 const dest = {
-  path: path.join(__dirname, "sockets", "quiet.sock"),
+  path: path.join(__dirname, "tmp", "quiet.sock"),
   writableAll: true,
 };
 
 function close() {
   server.close();
+  try { fs.rmSync("tmp/quiet.pid"); } catch (_) {}
   process.exit();
 }
 
@@ -238,6 +239,7 @@ process.on("SIGINT", close);
 process.on("SIGTERM", close);
 
 server.listen(dest, () => {
+  fs.writeFileSync("tmp/quiet.pid", process.pid.toString());
   console.error(`server started on ${dest.path} at ${new Date()}`)
   logger.info(`server started on ${dest.path}`);
 });

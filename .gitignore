@@ -1,5 +1,6 @@
 node_modules
 .env
 .login
-server/log/*.log
-server/sockets/*.sock
+*.log
+*.pid
+*.sock
