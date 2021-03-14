@@ -81,9 +81,15 @@ app.get("/api/relay/canvas-data", auth, (req, res) => {
   const room = rooms.get(req.user.roomId);
   if (room && room.length > 1) {
     // TODO: pick random peer rather than first;
-    const peerId = room.filter(peerId => peerId !== userId)[0];
-    const peer = clients.get(peerId);
-    peer && peer.emit("send-canvas-data", userId);
+    const peerId = room.find(peerId => clients.has(peerId));
+    if (peerId) {
+      const peer = clients.get(peerId);
+      peer.emit("send-canvas-data", userId);
+    } else {
+      // No connected peers to send canvas data to!
+      res.sendStatus(500);
+      return;
+    }
   }
   pendingCanvasRelays.set(userId, res);
 });
