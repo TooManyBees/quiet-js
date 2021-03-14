@@ -202,7 +202,7 @@ app.post("/api/:roomId/join", auth, (req, res) => {
 
   const userIds = activeUsers(room);
 
-  for (const peerId of room) {
+  for (const peerId of userIds) {
     if (peerId === req.user.id) continue;
     if (clients.has(peerId) && clients.has(req.user.id)) {
       clients.get(peerId).emit("add-peer", {
