@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher } from "svelte";
   export let selected = "draw";
-  const tools = ["draw", "zoom", "pan", "project"];
+  const tools = ["draw", "erase", "zoom", "pan", "project"];
   let selectedButton = "draw";
   let selectedOverride = null;
   $: {

@@ -19,8 +19,10 @@
 
   let cursor = "pointer";
   let altKey = false;
+  // TODO: tool name triggers CSS rules so we can use url() for custom cursors
   $: switch (tool) {
     case "draw":
+    case "erase":
       cursor = "crosshair";
       break;
     case "zoom":
@@ -125,12 +127,15 @@
     }
   }
 
-  function drawLine({ a, b, weight }) {
-    context.strokeStyle = "red",
+  function drawLine({ a, b, weight, mode }) {
+    const strokeSize = mode === "erase" ? 24 : 8;
+    const strokeStyle = mode === "erase" ? "white" : "red";
+
+    context.strokeStyle = strokeStyle,
     context.beginPath();
     context.moveTo(a.x, a.y);
     context.lineTo(b.x, b.y);
-    context.lineWidth = 8 * weight;
+    context.lineWidth = strokeSize * weight;
     context.lineCap = "round";
     context.stroke();
   }
@@ -169,7 +174,9 @@
   }
 
   onMount(() => {
-    context = canvas.getContext("2d");
+    context = canvas.getContext("2d", { alpha: false });
+    context.fillStyle = "white";
+    context.fillRect(0, 0, canvas.width, canvas.height);
   });
 
   onDestroy(() => {

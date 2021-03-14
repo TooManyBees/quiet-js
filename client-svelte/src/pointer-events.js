@@ -1,28 +1,33 @@
 export default function(node, tool) {
   /*--------- Begin drawing controls ---------*/
   let lastPoint;
+  let lastdrawmove;
+  let lastdrawend;
 
-  function drawstart(e) {
+  function drawstart(e, mode) {
     const thisPoint = { x: e.offsetX, y: e.offsetY };
     lastPoint = thisPoint;
-    const message = { a: thisPoint, b: thisPoint, weight: e.pressure };
+    const message = { a: thisPoint, b: thisPoint, weight: e.pressure, mode };
     node.dispatchEvent(new CustomEvent("drawline", {
       detail: message,
     }));
 
-    node.addEventListener("pointermove", drawmove);
-    node.addEventListener("pointercancel", drawend);
-    node.addEventListener("pointerleave", drawend);
-    node.addEventListener("pointerup", drawend);
+    lastdrawmove = e => drawmove(e, mode);
+    lastdrawend = e => drawend(e, mode);
+
+    node.addEventListener("pointermove", lastdrawmove);
+    node.addEventListener("pointercancel", lastdrawend);
+    node.addEventListener("pointerleave", lastdrawend);
+    node.addEventListener("pointerup", lastdrawend);
   }
 
-  function drawmove(e) {
+  function drawmove(e, mode) {
     const thisPoint = { x: e.offsetX, y: e.offsetY };
     if (!lastPoint) {
       lastPoint = thisPoint;
     }
     if (e.buttons) {
-      const message = { a: lastPoint, b: thisPoint, weight: e.pressure };
+      const message = { a: lastPoint, b: thisPoint, weight: e.pressure, mode };
       node.dispatchEvent(new CustomEvent("drawline", {
         detail: message,
       }));
@@ -30,12 +35,14 @@ export default function(node, tool) {
     lastPoint = thisPoint;
   }
 
-  function drawend() {
-    node.removeEventListener("pointermove", drawmove);
-    node.removeEventListener("pointercancel", drawend);
-    node.removeEventListener("pointerleave", drawend);
-    node.removeEventListener("pointerup", drawend);
-    node.dispatchEvent(new CustomEvent("drawend"));
+  function drawend(_, mode) {
+    node.removeEventListener("pointermove", lastdrawmove);
+    node.removeEventListener("pointercancel", lastdrawend);
+    node.removeEventListener("pointerleave", lastdrawend);
+    node.removeEventListener("pointerup", lastdrawend);
+    node.dispatchEvent(new CustomEvent(`drawend`, {
+      detail: { mode },
+    }));
   }
   /*---------- End drawing controls ----------*/
 
@@ -97,7 +104,9 @@ export default function(node, tool) {
   function onpointerdown(e) {
     switch (tool) {
     case "draw":
-      return drawstart(e);
+      return drawstart(e, "draw");
+    case "erase":
+      return drawstart(e, "erase");
     case "zoom":
       return zoom(e);
     case "pan":
