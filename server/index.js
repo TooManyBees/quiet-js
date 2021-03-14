@@ -235,4 +235,7 @@ function close() {
 process.on("SIGINT", close);
 process.on("SIGTERM", close);
 
-server.listen(dest, () => logger.info(`server started on ${dest.path}`));
+server.listen(dest, () => {
+  console.error(`server started on ${dest.path} at ${new Date()}`)
+  logger.info(`server started on ${dest.path}`);
+});
