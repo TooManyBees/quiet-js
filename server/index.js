@@ -71,7 +71,7 @@ app.get("/", (req, res) => {
   res.redirect(`/${slug}`);
 });
 
-app.get("/api/relay/canvas-data", auth, (req, res) => {
+app.get("/api/canvas-data", auth, (req, res) => {
   const userId = req.user.id;
   const { rooms, clients, pendingCanvasRelays } = app.locals;
 
@@ -83,7 +83,7 @@ app.get("/api/relay/canvas-data", auth, (req, res) => {
   const room = rooms.get(req.user.roomId);
   if (room && room.length > 1) {
     // TODO: pick random peer rather than first;
-    const peerId = room.find(peerId => clients.has(peerId));
+    const peerId = room.find(peerId => userId !== peerId && clients.has(peerId));
     if (peerId) {
       const peer = clients.get(peerId);
       peer.emit("send-canvas-data", userId);
@@ -96,14 +96,17 @@ app.get("/api/relay/canvas-data", auth, (req, res) => {
   pendingCanvasRelays.set(userId, res);
 });
 
-app.post("/api/relay/:peerId/canvas-data", auth, (req, res) => {
+app.post("/api/canvas-data/:peerId", auth, (req, res) => {
   const peerId = req.params.peerId;
   const pendingResponse = app.locals.pendingCanvasRelays.get(peerId);
   if (pendingResponse) {
     pendingResponse.status(200);
     pendingResponse.set("Content-Type", "application/octet-stream")
     req.pipe(pendingResponse);
-    res.sendStatus(204);
+    req.on('end', () => {
+      pendingResponse.end();
+      res.sendStatus(204);
+    });
   } else {
     res.sendStatus(404);
   }

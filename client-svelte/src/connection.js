@@ -163,7 +163,7 @@ async function createOffer(peerId, peer) {
 }
 
 export async function requestCanvas() {
-  const response = await fetch("/api/relay/canvas-data", {
+  const response = await fetch("/api/canvas-data/", {
     headers: {
       "Authorization": `Bearer ${token}`,
     },
@@ -175,7 +175,7 @@ export async function requestCanvas() {
 
 export async function sendCanvas(id, body) {
   const deflated = body.length > 0 ? pako.deflate(body) : body;
-  return fetch(`/api/relay/${id}/canvas-data`, {
+  return fetch(`/api/canvas-data/${id}`, {
     method: "POST",
     headers: {
       "Authorization": `Bearer ${token}`,
