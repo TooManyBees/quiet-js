@@ -1,3 +1,5 @@
+process.title = "node quiet-js";
+
 const express = require("express");
 const http = require("http");
 const uuid = require("uuid");

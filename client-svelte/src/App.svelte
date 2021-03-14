@@ -101,6 +101,7 @@
 	}
 
 	function changeMyName(name) {
+		userName = name;
 		userNames.set($userId, name);
 		userNames = userNames;
 		setUserName(name);
@@ -225,6 +226,7 @@
 		</Modal>
 	{/if}
 	<Info bind:visible={showInfo} />
+	<p style="position:fixed;bottom:0;right:0;margin:0;">{$userId}</p>
 </main>
 
 <style>
