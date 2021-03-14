@@ -130,7 +130,7 @@
     context.beginPath();
     context.moveTo(a.x, a.y);
     context.lineTo(b.x, b.y);
-    context.lineWidth = 10 * weight;
+    context.lineWidth = 8 * weight;
     context.lineCap = "round";
     context.stroke();
   }
