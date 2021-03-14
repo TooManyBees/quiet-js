@@ -40,12 +40,12 @@ const app = express();
 app.use(expressLogger);
 app.use(express.static(path.join(__dirname, "..", "client")));
 app.use(express.json());
-app.locals.rooms = new Map();
-app.locals.clients = new Map();
-app.locals.pendingCanvasRelays = new Map();
+const rooms = new Map();
+const clients = new Map();
+const pendingCanvasRelays = new Map();
 
 function activeUsers(room) {
-  return room.filter(id => app.locals.clients.has(id));
+  return room.filter(id => clients.has(id));
 }
 
 function auth(req, res, next) {
@@ -73,7 +73,6 @@ app.get("/", (req, res) => {
 
 app.get("/api/canvas-data", auth, (req, res) => {
   const userId = req.user.id;
-  const { rooms, clients, pendingCanvasRelays } = app.locals;
 
   const existingResponse = pendingCanvasRelays.get(userId);
   if (existingResponse) {
@@ -98,7 +97,7 @@ app.get("/api/canvas-data", auth, (req, res) => {
 
 app.post("/api/canvas-data/:peerId", auth, (req, res) => {
   const peerId = req.params.peerId;
-  const pendingResponse = app.locals.pendingCanvasRelays.get(peerId);
+  const pendingResponse = pendingCanvasRelays.get(peerId);
   if (pendingResponse) {
     pendingResponse.status(200);
     pendingResponse.set("Content-Type", "application/octet-stream")
@@ -114,7 +113,6 @@ app.post("/api/canvas-data/:peerId", auth, (req, res) => {
 
 app.post("/api/relay/:peerId/:event", auth, (req, res) => {
   const peerId = req.params.peerId;
-  const clients = app.locals.clients;
   const client = clients.get(peerId);
   if (client) {
     client.emit(req.params.event, { peer: req.user, data: req.body });
@@ -136,7 +134,6 @@ app.post("/api/access", (req, res) => {
 });
 
 function disconnected(user) {
-  const { clients, rooms } = app.locals;
   logger.debug(`disconnecting ${user.id}`);
   clients.delete(user.id);
 
@@ -177,7 +174,7 @@ app.get("/api/connect", auth, (req, res) => {
     }
   };
 
-  app.locals.clients.set(client.id, client);
+  clients.set(client.id, client);
   client.emit("connected", { user: req.user });
 
   req.on("close", () => disconnected(req.user));
@@ -186,7 +183,6 @@ app.get("/api/connect", auth, (req, res) => {
 app.post("/api/:roomId/join", auth, (req, res) => {
   // TODO: check that req.params.roomId === req.user.roomId
   const roomId = req.params.roomId;
-  const { clients, rooms } = app.locals;
   let room = rooms.get(roomId);
 
   if (!room) {
