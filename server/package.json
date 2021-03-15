@@ -1,7 +1,8 @@
 {
   "name": "quiet-js",
   "version": "0.0.0",
-  "description": "",
+  "description": "It serves.",
+  "repository": "It reposes.",
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,8 +14,8 @@
     "express": "^4.17.1",
     "express-pino-logger": "^6.0.0",
     "jsonwebtoken": "^8.5.1",
-    "niceware": "^2.0.1",
     "pino": "^6.11.2",
+    "sentencer": "^0.2.1",
     "uuid": "^8.3.2",
     "ws": "^7.4.3"
   }

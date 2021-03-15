@@ -3,13 +3,13 @@ process.title = "node quiet-js";
 const express = require("express");
 const http = require("http");
 const uuid = require("uuid");
-const niceware = require("niceware");
 const path = require("path");
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
 const pino = require("pino");
 const expressPino = require("express-pino-logger");
+const generateRoomName = require("./generateRoomName");
 
 dotenv.config();
 
@@ -68,7 +68,7 @@ function auth(req, res, next) {
 app.get("/", (req, res) => {
   let slug;
   while (!slug || rooms.has(slug)) {
-    slug = niceware.generatePassphrase(10).join("-");
+    slug = generateRoomName();
   }
   res.redirect(`/room/${slug}`);
 });
