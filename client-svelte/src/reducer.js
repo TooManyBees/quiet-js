@@ -9,11 +9,7 @@ export function initialState() {
       numberOfProjects: 0,
     },
     turnNumber: 0,
-    resources: [],
-    abundancies: [],
-    scarcities: [],
     projects: [],
-    contempt: {},
     canvasSize: {
       width: 256,
       height: 256,

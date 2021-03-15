@@ -26,13 +26,11 @@
 	});
 
 	const userNames = new Map();
-	const contempt = new Map();
 	let state = initialState();
 	let userName = getUserName() || `cool user ${~~(Math.random() * 100)}`;
 	$: users = $userIds.map(id => ({
 		id,
 		name: userNames.get(id) || id,
-		contempt: contempt.get(id) || 0,
 	}));
 
 	let needHistory = true;
