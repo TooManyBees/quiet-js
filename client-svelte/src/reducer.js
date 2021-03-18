@@ -92,6 +92,17 @@ export function reducer(state, action) {
         projects: [...state.projects, action.payload.project],
       };
     }
+    case "game:remove-project": {
+      const projects = [...state.projects];
+      const idx = projects.findIndex(p => p.id === action.payload.id);
+      if (idx) {
+        projects.splice(idx, 1);
+      }
+      return {
+        ...state,
+        projects,
+      };
+    }
     case "canvas:expand": {
       return {
         ...state,

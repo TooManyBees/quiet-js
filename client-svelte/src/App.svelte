@@ -49,8 +49,15 @@
 
 	function finishPlaceProject(e) {
 		pendingProject = null;
-		placeProject(e.detail);
-		broadcast({ type: "place-project", project: e.detail });
+		let lastId = 0;
+		try {
+			lastId = 1 + state.projects
+				.map(p => p.id)
+				.reduce((max, id) => Math.max(max, id));
+		} catch (_) {}
+		const project = { id: lastId, ...e.detail };
+		placeProject(project);
+		broadcast({ type: "place-project", project });
 	}
 
 	function cancelPlaceProject() {
@@ -60,6 +67,18 @@
 	function placeProject(project) {
 		state = reducer(state, {
 			type: "game:place-project", payload: { project },
+		});
+	}
+
+	function finishResolveProject(e) {
+		const id = e.detail.id;
+		resolveProject(id);
+		broadcast({ type: "resolve-project", id });
+	}
+
+	function resolveProject(id) {
+		state = reducer(state, {
+			type: "game:remove-project", payload: { id },
 		});
 	}
 
@@ -158,6 +177,9 @@
 		case "place-project":
 			placeProject(data.project);
 			break;
+		case "resolve-project":
+			resolveProject(data.id);
+			break;
 		case "update-state":
 			state = data.state;
 			if (needHistory) {
@@ -186,6 +208,7 @@
 		bind:this={canvas}
 		on:drawmulti={handleDrawMulti}
 		on:place-project={initiatePlaceProject}
+		on:resolve-project={finishResolveProject}
 		tool={selectedTool}
 		projects={state.projects}
 	/>

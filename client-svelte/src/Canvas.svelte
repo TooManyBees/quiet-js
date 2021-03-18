@@ -225,6 +225,6 @@
     style={`cursor: ${cursor};`}
   ></canvas>
   {#each projects as project}
-    <Project {...project} />
+    <Project {...project} on:resolve-project />
   {/each}
 </div>
