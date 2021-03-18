@@ -5,6 +5,7 @@
 
 <style>
   aside {
+    border-top: 1px solid #333;
     background-color: white;
     padding: 1rem;
     transform: translate(0); /* Appear above Canvas which is transformed */
