@@ -2,6 +2,7 @@
 *.sock
 .git
 *.log
+*.state
 node_modules
 .DS_Store
 .gitignore
