@@ -7,11 +7,20 @@ const path = require("path");
 const fs = require("fs");
 const jwt = require("jsonwebtoken");
 const dotenv = require("dotenv");
+const expressBasicAuth = require("express-basic-auth");
 const pino = require("pino");
 const expressPino = require("express-pino-logger");
 const generateRoomName = require("./generateRoomName");
 
 dotenv.config();
+
+let basicAuthUsers = {};
+try {
+  const text = fs.readFileSync(".users.json");
+  basicAuthUsers = JSON.parse(text);
+} catch (e) {
+  console.error("Couldn't load users file", e);
+}
 
 function slice(object, fields) {
   const result = {};
@@ -74,7 +83,12 @@ app.get("/", (req, res) => {
 });
 
 const START_TIME = Date.now();
-app.get("/api/status", (req, res) => {
+const basicAuthMiddleware = expressBasicAuth({
+  users: basicAuthUsers,
+  challenge: true,
+  realm: "quiet.enbies.online",
+});
+app.get("/admin/status", basicAuthMiddleware, (req, res) => {
   const usersPerRoom = Object.fromEntries(Array.from(rooms).map(([k, vs]) => [k, vs.length]));
   const uptime = Math.floor((Date.now() - START_TIME) / 1000);
   const status = {

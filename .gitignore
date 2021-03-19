@@ -1,6 +1,7 @@
 node_modules
 .env
 .login
+.users.json
 *.log
 *.pid
 *.sock
