@@ -73,6 +73,19 @@ app.get("/", (req, res) => {
   res.redirect(`/room/${slug}`);
 });
 
+const START_TIME = Date.now();
+app.get("/api/status", (req, res) => {
+  const usersPerRoom = Object.fromEntries(Array.from(rooms).map(([k, vs]) => [k, vs.length]));
+  const uptime = Math.floor((Date.now() - START_TIME) / 1000);
+  const status = {
+    uptime,
+    numRooms: rooms.length,
+    numClients: clients.size,
+    rooms: usersPerRoom,
+  };
+  res.json(status);
+});
+
 app.get("/api/canvas-data", auth, (req, res) => {
   const userId = req.user.id;
 
@@ -237,19 +250,6 @@ function close() {
 
 process.on("SIGINT", close);
 process.on("SIGTERM", close);
-
-const STATE_FILE = "tmp/quiet.state";
-const START_TIME = Date.now();
-process.on("SIGUSR1", (e) => {
-  const usersPerRoom = Object.fromEntries(Array.from(rooms).map(([k, vs]) => [k, vs.length]));
-  const uptime = Math.floor((Date.now() - START_TIME) / 1000);
-  fs.writeFileSync(STATE_FILE, JSON.stringify({
-    uptime,
-    numRooms: rooms.length,
-    numClients: clients.size,
-    rooms: usersPerRoom,
-  }));
-});
 
 server.listen(dest, () => {
   fs.writeFileSync("tmp/quiet.pid", process.pid.toString());
