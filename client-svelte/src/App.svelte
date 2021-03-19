@@ -37,7 +37,7 @@
 	let canvas;
 	let selectedTool = "draw";
 	let showInfo = false;
-	$: currentId = $userIds[state.turnNumber % $userIds.length];
+	$: currentId = $userIds.includes(state.currentPeerId) ? state.currentPeerId : $userIds[0];
 	$: yourTurn = $userId === currentId;
 	$: drawn = state.yourTurn.drawn;
 
@@ -82,10 +82,7 @@
 		});
 	}
 
-	let startingTurn = 0;
-
 	function initiateStartGame(event) {
-		startingTurn = event.detail.startingTurn;
 		state = reducer(state, { type: "game:initiate-start" });
 	}
 
@@ -93,7 +90,7 @@
 		const fleeting = !!event.detail.fleeting;
 		state = reducer(state, { type: "game:start", payload: {
 			fleeting,
-			startingTurn,
+			userId: $userId,
 		}});
 		broadcast({ type: "update-state", state });
 	}
@@ -103,12 +100,16 @@
 	}
 
 	function passYourTurn() {
-		state = reducer(state, { type: "game:end-turn" });
+		const ids = $userIds;
+		const nextPeerId = ids[(ids.indexOf(currentId) + 1) % ids.length];
+		state = reducer(state, { type: "game:end-turn", payload: { userId: $userId, nextPeerId } });
 		broadcast({ type: "update-state", state });
 	}
 
 	function passOthersTurn() {
-		state = reducer(state, { type: "game:next-turn" });
+		const ids = $userIds;
+		const nextPeerId = ids[(ids.indexOf(currentId) + 1) % ids.length];
+		state = reducer(state, { type: "game:next-turn", payload: { nextPeerId } });
 		broadcast({ type: "update-state", state });
 	}
 

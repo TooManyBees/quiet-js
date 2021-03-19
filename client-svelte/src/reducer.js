@@ -8,7 +8,7 @@ export function initialState() {
       drawn: 0,
       numberOfProjects: 0,
     },
-    turnNumber: 0,
+    currentPeerId: null,
     projects: [],
     canvasSize: {
       width: 256,
@@ -33,12 +33,12 @@ export function reducer(state, action) {
       };
     }
     case "game:start": {
-      const { fleeting, startingTurn } = action.payload;
+      const { fleeting, userId } = action.payload;
       return {
         ...state,
         phase: "started",
         deck: newDeck(fleeting),
-        turnNumber: startingTurn || 0,
+        currentPeerId: userId,
       };
     }
     case "game:draw-card": {
@@ -56,11 +56,12 @@ export function reducer(state, action) {
     case "game:next-turn": {
       return {
         ...state,
-        turnNumber: state.turnNumber + 1,
+        currentPeerId: action.payload.nextPeerId,
       };
     }
     case "game:end-turn": {
       const { drawn, numberOfProjects } = state.yourTurn;
+      const { userId, nextPeerId } = action.payload;
       let projects = state.projects;
       if (drawn) {
         projects = [
@@ -81,7 +82,7 @@ export function reducer(state, action) {
           drawn: null,
           numberOfProjects: projects.length,
         },
-        turnNumber: state.turnNumber + 1,
+        currentPeerId: nextPeerId,
         projects,
         history,
       };
