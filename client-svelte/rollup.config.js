@@ -1,9 +1,11 @@
+import fs from 'fs';
 import svelte from 'rollup-plugin-svelte';
 import commonjs from '@rollup/plugin-commonjs';
 import resolve from '@rollup/plugin-node-resolve';
 import livereload from 'rollup-plugin-livereload';
 import { terser } from 'rollup-plugin-terser';
 import css from 'rollup-plugin-css-only';
+import webWorkerLoader from 'rollup-plugin-web-worker-loader';
 
 const production = !process.env.ROLLUP_WATCH;
 
@@ -45,7 +47,20 @@ export default {
 		}),
 		// we'll extract any component CSS out into
 		// a separate file - better for performance
-		css({ output: 'bundle.css' }),
+		css({
+			output: function(styles, styleNodes) {
+				// We must be explicit here when using bundle splitting
+				// (caused by webWorkerLoader's inline: false)
+				fs.writeFileSync("public/build/bundle.css", styles);
+			},
+		}),
+
+		webWorkerLoader({
+			targetPlatform: "browser",
+			inline: false,
+			preserveFileNames: true,
+			loadPath: "/build",
+		}),
 
 		// If you have external dependencies installed from
 		// npm, you'll most likely need these plugins. In

@@ -1,6 +1,8 @@
 import { readable, writable, derived, get } from "svelte/store";
 import { getSessionToken, setSessionToken } from "./storage.js";
-import pako from "pako";
+import DeflateWorker from "web-worker:./deflateWorker.js";
+
+const deflateWorker = new DeflateWorker();
 
 export const roomId = window.location.pathname.split("/").slice(-1)[0];
 let token = null;
@@ -168,12 +170,21 @@ export async function requestCanvas() {
     },
   })
   const body = await response.arrayBuffer();
-  const inflated = body.byteLength > 0 ? pako.inflate(body) : body;
+  const inflated = body.byteLength > 0 ? (await new Promise((resolve, reject) => {
+    deflateWorker.postMessage({ type: "inflate", bytes: body });
+    deflateWorker.addEventListener("message", (event) => resolve(event.data), { once: true });
+    deflateWorker.addEventListener("error", reject, { once: true });
+  })) : body;
   return inflated;
 }
 
 export async function sendCanvas(id, body) {
-  const deflated = body.length > 0 ? pako.deflate(body) : body;
+  const deflated = body.length > 0 ? (await new Promise((resolve, reject) => {
+    deflateWorker.postMessage({ type: "deflate", bytes: body });
+    deflateWorker.addEventListener("message", (event) => resolve(event.data), { once: true });
+    deflateWorker.addEventListener("error", reject, { once: true });
+  })) : body;
+
   return fetch(`/api/canvas-data/${id}`, {
     method: "POST",
     headers: {
