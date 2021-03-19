@@ -1,3 +1,4 @@
+#!/bin/sh
 cd server
 if [ -e tmp/quiet.pid ]; then
   PROC=$(cat tmp/quiet.pid)
