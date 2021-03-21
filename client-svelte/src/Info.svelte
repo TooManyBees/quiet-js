@@ -47,12 +47,21 @@
     font-variant-ligatures: discretionary-ligatures;
     line-height: 1;
   }
+
+  .underlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+  }
 </style>
 
 <button class="open-button" on:click={() => visible = true}>
   <img src="/icons/info.svg" alt="Info bubble" title="About">
 </button>
 {#if visible}
+  <div class="underlay" on:click={() => visible = false}></div>
   <aside transition:fly={{ y: 200, duration: 250 }}>
     <header>
       <h1>How to play The Quiet Year remotely</h1>
