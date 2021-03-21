@@ -232,23 +232,19 @@
 		/>
 	</div>
 	{#if state.phase === "starting"}
-		<Modal>
-			<StartGame
-				on:start-game={startGame}
-				on:cancel={() => state = reducer(state, { type: "game:cancel-start" })}
-			/>
+		<Modal on:cancel={() => state = reducer(state, { type: "game:cancel-start" })}>
+			<StartGame on:start-game={startGame} />
 		</Modal>
 	{:else if pendingProject}
-		<Modal>
+		<Modal on:cancel={cancelPlaceProject}>
 			<PlacingProject
 				project={pendingProject}
 				on:place-project={finishPlaceProject}
-				on:cancel={cancelPlaceProject}
 			/>
 		</Modal>
 	{/if}
 	<Info bind:visible={showInfo} />
-	<p style="position:fixed;bottom:0;right:0;margin:0;">{$userId}</p>
+	<!-- <p style="position:fixed;bottom:0;right:0;margin:0;">{$userId}</p> -->
 </main>
 
 <style>

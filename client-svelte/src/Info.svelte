@@ -1,5 +1,6 @@
 <script>
   import { fly } from "svelte/transition";
+  import CancelButton from "./Modal/CancelButton.svelte";
   export let visible = true;
 </script>
 
@@ -55,7 +56,7 @@
   <aside transition:fly={{ y: 200, duration: 250 }}>
     <header>
       <h1>How to play The Quiet Year remotely</h1>
-      <button on:click={() => visible = false}>Close</button>
+      <CancelButton onclick={() => visible = false} />
     </header>
 
     <p>

@@ -17,11 +17,6 @@
       y: project.y,
     });
   }
-
-  function cancel(event) {
-    event.preventDefault();
-    dispatch("cancel");
-  }
 </script>
 
 <style>
@@ -76,5 +71,4 @@
     bind:value={description}
   >
   <input type="submit" value="Place Project">
-  <button on:click={cancel}>Cancel</button>
 </form>

@@ -1,3 +1,22 @@
+<script>
+  import { createEventDispatcher } from "svelte";
+  import CancelButton from "./Modal/CancelButton.svelte";
+
+  const dispatch = createEventDispatcher();
+
+  let wrapper;
+
+  function cancel() {
+    dispatch("cancel");
+  }
+
+  function cancelOnWrapper(e) {
+    if (event.target === wrapper) {
+      cancel();
+    }
+  }
+</script>
+
 <style>
   .wrapper {
     position: fixed;
@@ -13,6 +32,7 @@
   }
 
   .modal {
+    position: relative;
     background-color: white;
     border-radius: 5px;
     padding: 1rem;
@@ -22,8 +42,9 @@
 </style>
 
 {#if $$slots.default}
-  <div class="wrapper">
+  <div class="wrapper" bind:this={wrapper} on:click={cancelOnWrapper}>
     <div class="modal">
+      <CancelButton onclick={cancel} />
       <slot />
     </div>
   </div>
