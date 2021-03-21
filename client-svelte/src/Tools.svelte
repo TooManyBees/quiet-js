@@ -1,7 +1,6 @@
 <script>
   import { createEventDispatcher } from "svelte";
   export let selected = "draw";
-  const tools = ["draw", "erase", "zoom", "pan", "project"];
   let selectedButton = "draw";
   let selectedOverride = null;
   $: {
@@ -29,9 +28,6 @@
 
 <style>
   #tool-palette {
-    background-color: rgba(0, 0, 0, 0.25);
-    border-radius: 1rem;
-    padding: 1rem;
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -49,12 +45,29 @@
     margin: 0;
   }
 
+  label {
+    border-radius: 50%;
+    padding: 4px;
+  }
+
   label, button {
     cursor: pointer;
   }
 
   .selected {
-    text-decoration: underline;
+    background-color: rgba(236, 135, 97, 0.4);
+  }
+
+  img {
+    width: 2rem;
+    height: 2rem;
+    display: block;
+  }
+
+  img.magnifier {
+    position: relative;
+    top: 3px;
+    left: 1px;
   }
 </style>
 
@@ -64,15 +77,25 @@
 />
 
 <div id="tool-palette">
-  {#each tools as tool}
-    <label class:selected={tool === selected}>
-      <input
-        type="radio"
-        bind:group={selectedButton}
-        value={tool}
-      >
-      {tool}
-    </label>
-  {/each}
+  <label class:selected={selected === "draw"}>
+    <input type="radio" bind:group={selectedButton} value="draw">
+    <img src="/icons/pencil.svg" alt="pencil" title="Draw">
+  </label>
+  <label class:selected={selected === "erase"}>
+    <input type="radio" bind:group={selectedButton} value="erase">
+    <img src="/icons/eraser.svg" alt="eraser" title="Erase">
+  </label>
+  <label class:selected={selected === "zoom"}>
+    <input type="radio" bind:group={selectedButton} value="zoom">
+    <img class="magnifier" src="/icons/zoom-in.svg" alt="magnifying glass with plus" title="Zoom In">
+  </label>
+  <label class:selected={selected === "pan"}>
+    <input type="radio" bind:group={selectedButton} value="pan">
+    <img src="/icons/move-selector.svg" alt="Cross with arrows pointing in 4 directions" title="Pan">
+  </label>
+  <label class:selected={selected === "project"}>
+    <input type="radio" bind:group={selectedButton} value="project">
+    <img src="/icons/dice.svg" alt="6 sided die" title="Place new project">
+  </label>
   <button on:click={expandCanvas}>Expand map borders</button>
 </div>

@@ -30,6 +30,15 @@
     position: absolute;
     bottom: 0;
     left: 0;
+    background-color: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
+  .open-button img {
+    width: 2rem;
+    height: 2rem;
+    display: block;
   }
 
   .card {
@@ -39,7 +48,9 @@
   }
 </style>
 
-<button class="open-button" on:click={() => visible = true}>About</button>
+<button class="open-button" on:click={() => visible = true}>
+  <img src="/icons/info.svg" alt="Info bubble" title="About">
+</button>
 {#if visible}
   <aside transition:fly={{ y: 200, duration: 250 }}>
     <header>
@@ -74,7 +85,7 @@
     </p>
 
     <p>
-      The font for dice and playing card symbols is <a href="https://speakthesky.itch.io/typeface-dicier" target="_blank">Dicier</a> by Speak the Sky, used under the <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0 license</a>.
+      The font for dice and playing card symbols is <a href="https://speakthesky.itch.io/typeface-dicier" target="_blank">Dicier</a> by Speak the Sky, used under the <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank">CC BY 4.0 license</a>. Icons by <a href="https://www.freepik.com" target="_blank">Freepik</a> from <a href="https://www.flaticon.com/" target="_blank">www.flaticon.com</a>.
     </p>
   </aside>
 {/if}
