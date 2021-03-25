@@ -160,6 +160,12 @@
 
   let zoom = 1.0;
 
+  function handleTransform(event) {
+    panX = event.detail.x;
+    panY = event.detail.y;
+    zoom = event.detail.scale;
+  }
+
   function handleZoomIn() {
     zoom = zoom * 1.5;
   }
@@ -218,9 +224,9 @@
     use:pointerEvents={tool}
     on:drawline={handleDrawLine}
     on:drawend={handleDrawEnd}
-    on:pan={handlePan}
     on:zoom-in={handleZoomIn}
     on:zoom-out={handleZoomOut}
+    on:transform={handleTransform}
     on:place-project={handlePlaceProject}
     style={`cursor: ${cursor};`}
   ></canvas>
