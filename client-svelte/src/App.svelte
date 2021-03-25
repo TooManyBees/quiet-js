@@ -38,7 +38,7 @@
 	let selectedTool = "draw";
 	let showInfo = false;
 	$: currentId = $userIds.includes(state.currentPeerId) ? state.currentPeerId : $userIds[0];
-	$: yourTurn = $userId === currentId;
+	$: yourTurn = state.phase === "started" && $userId === currentId;
 	$: drawn = state.yourTurn.drawn;
 
 	let pendingProject = null;
