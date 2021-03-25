@@ -10,6 +10,22 @@
 
 	const dispatch = createEventDispatcher();
 
+	let opened = false;
+	let hiddenPanel;
+	let hiddenHeight = 0;
+	afterUpdate(() => {
+		if (hiddenPanel) {
+			hiddenHeight = hiddenPanel.getBoundingClientRect().height;
+		}
+	});
+	function openPanel(e) {
+		e.stopPropagation();
+		opened = true;
+	}
+	function closePanel() {
+		opened = false;
+	}
+
 	let editing = false;
 	let focusEditField = false;
 	$: userName = users.find(u => u.id === selfId)?.name;
@@ -50,20 +66,36 @@
 
 <style>
 	.wrapper {
-		border-radius: 1rem;
+		border-top-left-radius: 0.5rem;
+		border-top-right-radius: 0.5rem;
 		overflow: hidden;
 		min-width: 10rem;
 		max-width: 15rem;
+
+		position: fixed;
+		bottom: 0;
+		right: 1rem;
+	}
+
+	.collapsible {
+		transition: height 0.25s;
+	}
+
+	header {
+		padding: 0.4rem 1rem;
+		font-size: 1.5rem;
+	}
+
+	header.closed {
+		cursor: pointer;
 	}
 
 	.users-list {
 		padding: 1rem;
-		background-color: rgba(0, 0, 0, 0.25);
 	}
 
 	.controls {
 		padding: 1rem;
-		background-color: yellow;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -123,48 +155,56 @@
 	}
 </style>
 
+<svelte:window on:click={closePanel} />
 <div class="wrapper" class:empty={users.length === 0}>
-	<ol class="users-list">
-		{#each users as user (user.id)}
-			<li class:self={user.id === selfId} class:current={!pregame && user.id === currentId}>
-				{#if user.id === selfId}
-					{#if editing}
-						<form on:submit={handleUpdateName}>
-							<input
-								class="name"
-								type="text"
-								bind:this={input}
-								bind:value={newUserName}
-								on:blur={handleUpdateName}
-							>
-						</form>
-					{:else}
-						<button
-							class="name"
-							on:click={handleStartEditing}
-							title="Edit name"
-						>{user.name}</button>
-					{/if}
+	<header on:click={openPanel} class:closed={!opened}>
+		{users.length} player{users.length !== 1 ? 's' : ''}
+	</header>
+	<div class="collapsible" style={`height:${opened ? hiddenHeight : 0}px;`}>
+		<div bind:this={hiddenPanel}>
+			<div class="controls">
+				{#if phase === "pregame" || phase === "starting"}
+					<button on:click={startGame}>Start game</button>
 				{:else}
-					<span class="name">{user.name}</span>
-				{/if}
-			</li>
-		{/each}
-	</ol>
-	<div class="controls">
-		{#if phase === "pregame"}
-			<button on:click={startGame}>Start</button>
-		{:else}
-			{#if phase === "started"}
-				{#if yourTurn}
-					{#if !drawn}
-						<button on:click={() => dispatch("draw-card")}>Draw Card</button>
-					{:else}
-						<span class="drawn-card">{drawn}</span>
+					{#if phase === "started"}
+						{#if yourTurn}
+							{#if !drawn}
+								<button on:click={() => dispatch("draw-card")}>Draw Card</button>
+							{:else}
+								<span class="drawn-card">{drawn}</span>
+							{/if}
+						{/if}
+						<button on:click={passTurn}>Pass Turn</button>
 					{/if}
 				{/if}
-				<button on:click={passTurn}>Pass Turn</button>
-			{/if}
-		{/if}
+			</div>
+			<ol class="users-list">
+				{#each users as user (user.id)}
+					<li class:self={user.id === selfId} class:current={!pregame && user.id === currentId}>
+						{#if user.id === selfId}
+							{#if editing}
+								<form on:submit={handleUpdateName}>
+									<input
+										class="name"
+										type="text"
+										bind:this={input}
+										bind:value={newUserName}
+										on:blur={handleUpdateName}
+									>
+								</form>
+							{:else}
+								<button
+									class="name"
+									on:click={handleStartEditing}
+									title="Click to edit name"
+								>{user.name}</button>
+							{/if}
+						{:else}
+							<span class="name">{user.name}</span>
+						{/if}
+					</li>
+				{/each}
+			</ol>
+		</div>
 	</div>
 </div>
