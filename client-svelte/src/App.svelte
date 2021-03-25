@@ -36,7 +36,6 @@
 	let needHistory = true;
 	let canvas;
 	let selectedTool = "draw";
-	let showInfo = false;
 	$: currentId = $userIds.includes(state.currentPeerId) ? state.currentPeerId : $userIds[0];
 	$: yourTurn = state.phase === "started" && $userId === currentId;
 	$: drawn = state.yourTurn.drawn;
@@ -243,7 +242,7 @@
 			/>
 		</Modal>
 	{/if}
-	<Info bind:visible={showInfo} />
+	<Info />
 	<!-- <p style="position:fixed;bottom:0;right:0;margin:0;">{$userId}</p> -->
 </main>
 

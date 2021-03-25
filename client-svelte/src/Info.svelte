@@ -1,7 +1,8 @@
 <script>
   import { fly } from "svelte/transition";
   import CancelButton from "./Modal/CancelButton.svelte";
-  export let visible = true;
+  let creditsVisible = false;
+  let aboutVisible = false;
 </script>
 
 <style>
@@ -27,19 +28,35 @@
     margin: 0;
   }
 
-  .open-button {
+  .buttons {
     position: absolute;
     bottom: 0;
     left: 0;
+    display: flex;
+  }
+
+  .open-button {
     background-color: transparent;
     border: none;
     cursor: pointer;
+    display: flex;
+    align-items: center;
   }
 
   .open-button img {
     width: 2rem;
     height: 2rem;
     display: block;
+  }
+
+  .label {
+    margin-left: 0.5rem;
+  }
+
+  @media (max-width: 360px) {
+    .label {
+      display: none;
+    }
   }
 
   .card {
@@ -57,15 +74,22 @@
   }
 </style>
 
-<button class="open-button" on:click={() => visible = true}>
-  <img src="/icons/info.svg" alt="Info bubble" title="About">
-</button>
-{#if visible}
-  <div class="underlay" on:click={() => visible = false}></div>
+<div class="buttons">
+  <button class="open-button" on:click={() => aboutVisible = true}>
+    <img src="/icons/question-mark.svg" alt="Question mark">
+    <span class="label">About</span>
+  </button>
+  <button class="open-button" on:click={() => creditsVisible = true}>
+    <img src="/icons/info.svg" alt="Info bubble">
+    <span class="label">Credits</span>
+  </button>
+</div>
+{#if aboutVisible}
+  <div class="underlay" on:click={() => aboutVisible = false}></div>
   <aside transition:fly={{ y: 200, duration: 250 }}>
     <header>
       <h1>How to play The Quiet Year remotely</h1>
-      <CancelButton onclick={() => visible = false} />
+      <CancelButton onclick={() => aboutVisible = false} />
     </header>
 
     <p>
@@ -83,8 +107,15 @@
     <p>
       On your turn, click the Draw button to draw a card. Announce your action to your friends, because they can't see it. Projects will automatically tick down when you end your turn, but it's up to you to remove them when appropriate. The only other automatic actions are to shuffle a virtual deck for you, and discard cards when <span class="card">KING_DIAMONDS</span> is drawn.
     </p>
-
-    <h2>Credits</h2>
+  </aside>
+{/if}
+{#if creditsVisible}
+  <div class="underlay" on:click={() => creditsVisible = false}></div>
+  <aside transition:fly={{ y: 200, duration: 250 }}>
+    <header>
+      <h1>Credits</h1>
+      <CancelButton onclick={() => creditsVisible = false} />
+    </header>
 
     <p>
       <a href="https://buriedwithoutceremony.com/the-quiet-year" target="_blank">The Quiet Year</a> is created by Avery Alder. This site is in no way affiliated with or endorsed by her. You will still need the game's rules (available as a <a href="https://store.buriedwithoutceremony.com/collections/frontpage/products/the-quiet-year-pdf" target="_blank">PDF</a> or <a href="https://store.buriedwithoutceremony.com/collections/frontpage/products/the-quiet-year" target="_blank">physical media</a>) to play.
