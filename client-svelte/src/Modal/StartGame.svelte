@@ -4,7 +4,7 @@
   const dispatch = createEventDispatcher();
 </script>
 
-<h2>Start</h2>
+<h2>Start Game</h2>
 <div class="choices">
   <button on:click={() => dispatch("start-game", { fleeting: false })}>52 turns</button>
   <button on:click={() => dispatch("start-game", { fleeting: true })}>36 turns</button>

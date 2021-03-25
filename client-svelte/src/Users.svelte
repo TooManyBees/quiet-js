@@ -18,8 +18,7 @@
 			hiddenHeight = hiddenPanel.getBoundingClientRect().height;
 		}
 	});
-	function openPanel(e) {
-		e.stopPropagation();
+	function openPanel() {
 		opened = true;
 	}
 	function closePanel() {
@@ -41,7 +40,7 @@
 		dispatch(yourTurn ? "pass-turn" : "pass-others-turn");
 	}
 
-	function handleStartEditing(event) {
+	function handleStartEditing() {
 		newUserName = userName;
 		editing = true;
 		focusEditField = true;
@@ -68,6 +67,9 @@
 	.wrapper {
 		border-top-left-radius: 0.5rem;
 		border-top-right-radius: 0.5rem;
+		border-style: solid;
+		border-color: var(--outline);
+		border-width: 4px 4px 0 4px;
 		overflow: hidden;
 		min-width: 10rem;
 		max-width: 15rem;
@@ -75,6 +77,8 @@
 		position: fixed;
 		bottom: 0;
 		right: 1rem;
+
+		background-color: var(--bg-med);
 	}
 
 	.collapsible {
@@ -132,21 +136,19 @@
 	button.name {
 		border: none;
 		background-color: transparent;
+		color: inherit;
+		text-decoration: none;
 	}
 
 	input {
-		width: 100%;
+		width: 8rem;
 		display: block;
 		margin: 0;
 		border: none;
 	}
 
-	.self .name {
-		text-decoration: underline;
-	}
-
 	.current .name {
-		color: white;
+		color: var(--accent);
 	}
 
 	.drawn-card {
@@ -156,7 +158,7 @@
 </style>
 
 <svelte:window on:click={closePanel} />
-<div class="wrapper" class:empty={users.length === 0}>
+<div class="wrapper" on:click={e => e.stopPropagation()} class:empty={users.length === 0}>
 	<header on:click={openPanel} class:closed={!opened}>
 		{users.length} player{users.length !== 1 ? 's' : ''}
 	</header>
@@ -197,7 +199,7 @@
 									class="name"
 									on:click={handleStartEditing}
 									title="Click to edit name"
-								>{user.name}</button>
+								>{user.name} ✏️</button>
 							{/if}
 						{:else}
 							<span class="name">{user.name}</span>

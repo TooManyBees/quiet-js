@@ -201,7 +201,8 @@
 	onMount(() => connect(onPeerData));
 </script>
 
-<main>
+<main class:your-turn={yourTurn}>
+	<div class="frame">
 	<Canvas
 		width={256}
 		height={256}
@@ -244,6 +245,7 @@
 	{/if}
 	<Info />
 	<!-- <p style="position:fixed;bottom:0;right:0;margin:0;">{$userId}</p> -->
+	</div>
 </main>
 
 <style>
@@ -251,6 +253,25 @@
 		width: 100%;
 		height: 100%;
 		overflow: hidden;
+		touch-action: none;
+		box-sizing: border-box;
+		padding: 0.25rem;
+
+		background-image: linear-gradient(20deg, var(--gradient-bottom), var(--gradient-middle) 30%, var(--gradient-middle) 70%, var(--gradient-top));
+	}
+	main.your-turn {
+		/*padding: 0;*/
+		/*border: 0.25rem dashed #ff0086;*/
+		background-color: var(--accent);
+		background-image: none;
+		--outline: var(--accent);
+	}
+	.frame {
+		background-color: var(--bg-deep);
+		width: 100%;
+		height: 100%;
+		box-sizing: border-box;
+		border-radius: 0.25rem;
 	}
 	.wrapper {
 		position: fixed;

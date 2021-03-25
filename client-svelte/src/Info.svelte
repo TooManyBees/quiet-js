@@ -1,17 +1,18 @@
 <script>
   import { fly } from "svelte/transition";
   import CancelButton from "./Modal/CancelButton.svelte";
-  let creditsVisible = false;
   let aboutVisible = false;
+  let howToVisible = false;
 </script>
 
 <style>
   aside {
-    border-top: 1px solid #333;
-    background-color: white;
+    border-top: 0.25rem solid var(--outline);
+    background-color: var(--bg-med);
     padding: 1rem;
     transform: translate(0); /* Appear above Canvas which is transformed */
     position: fixed;
+    left: 0;
     bottom: 0;
     box-sizing: border-box;
     max-height: 100vh;
@@ -53,7 +54,7 @@
     margin-left: 0.5rem;
   }
 
-  @media (max-width: 360px) {
+  @media (max-width: 500px) {
     .label {
       display: none;
     }
@@ -75,21 +76,21 @@
 </style>
 
 <div class="buttons">
-  <button class="open-button" on:click={() => aboutVisible = true}>
+  <button class="open-button" on:click={() => howToVisible = true}>
     <img src="/icons/question-mark.svg" alt="Question mark">
+    <span class="label">How to use this site</span>
+  </button>
+  <button class="open-button" on:click={() => aboutVisible = true}>
+    <img src="/icons/info.svg" alt="Info bubble">
     <span class="label">About</span>
   </button>
-  <button class="open-button" on:click={() => creditsVisible = true}>
-    <img src="/icons/info.svg" alt="Info bubble">
-    <span class="label">Credits</span>
-  </button>
 </div>
-{#if aboutVisible}
-  <div class="underlay" on:click={() => aboutVisible = false}></div>
+{#if howToVisible}
+  <div class="underlay" on:click={() => howToVisible = false}></div>
   <aside transition:fly={{ y: 200, duration: 250 }}>
     <header>
       <h1>How to play The Quiet Year remotely</h1>
-      <CancelButton onclick={() => aboutVisible = false} />
+      <CancelButton onclick={() => howToVisible = false} />
     </header>
 
     <p>
@@ -109,12 +110,12 @@
     </p>
   </aside>
 {/if}
-{#if creditsVisible}
-  <div class="underlay" on:click={() => creditsVisible = false}></div>
+{#if aboutVisible}
+  <div class="underlay" on:click={() => aboutVisible = false}></div>
   <aside transition:fly={{ y: 200, duration: 250 }}>
     <header>
       <h1>Credits</h1>
-      <CancelButton onclick={() => creditsVisible = false} />
+      <CancelButton onclick={() => aboutVisible = false} />
     </header>
 
     <p>

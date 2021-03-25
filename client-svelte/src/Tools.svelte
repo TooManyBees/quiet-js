@@ -30,11 +30,24 @@
   #tool-palette {
     display: flex;
     justify-content: space-between;
-    align-items: center;
+    align-items: flex-start;
   }
 
-  #tool-palette > * {
-    margin: 0 0.5rem;
+  @media (min-width: 361px) {
+    #tool-palette > :not(:first-child) {
+      margin-left: 0.5rem;
+    }
+    #tool-palette > :not(:last-child) {
+      margin-right: 0.5rem;
+    }
+  }
+  @media (max-width: 360px) {
+    #tool-palette > :not(:first-child) {
+      margin-left: 0.25rem;
+    }
+    #tool-palette > :not(:last-child) {
+      margin-right: 0.25rem;
+    }
   }
 
   input[type="radio"] {

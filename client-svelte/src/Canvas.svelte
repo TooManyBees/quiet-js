@@ -193,7 +193,7 @@
   }
   canvas {
     background-color: white;
-    outline: 20px solid #eee;
+    outline: 20px solid var(--bg-med);
   }
 </style>
 

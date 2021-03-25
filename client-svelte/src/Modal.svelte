@@ -24,7 +24,6 @@
     left: 0;
     right: 0;
     bottom: 0;
-    background-color: rgba(0, 0, 0, 0.15);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -33,7 +32,8 @@
 
   .modal {
     position: relative;
-    background-color: white;
+    background-color: var(--bg-med);
+    border: 0.25rem solid var(--outline);
     border-radius: 5px;
     padding: 1rem;
     flex: 1;
