@@ -18,8 +18,8 @@
 			hiddenHeight = hiddenPanel.getBoundingClientRect().height;
 		}
 	});
-	function openPanel() {
-		opened = true;
+	function togglePanel() {
+		opened = !opened;
 	}
 	function closePanel() {
 		opened = false;
@@ -31,13 +31,19 @@
 	let newUserName;
 	let input;
 
-	function startGame() {
+	function startGame(event) {
+		event.stopPropagation();
 		const startingTurn = users.findIndex(u => u.id === selfId) || 0;
 		dispatch("start-game", { startingTurn });
 	}
 
 	function passTurn() {
 		dispatch(yourTurn ? "pass-turn" : "pass-others-turn");
+	}
+
+	function drawCard(event) {
+		event.stopPropagation();
+		dispatch("draw-card");
 	}
 
 	function handleStartEditing() {
@@ -88,9 +94,6 @@
 	header {
 		padding: 0.4rem 1rem;
 		font-size: 1.5rem;
-	}
-
-	header.closed {
 		cursor: pointer;
 	}
 
@@ -99,7 +102,7 @@
 	}
 
 	.controls {
-		padding: 1rem;
+		padding: 1rem 1rem 0 1rem;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
@@ -131,6 +134,7 @@
 		display: block;
 		margin: 0;
 		cursor: pointer;
+		padding: 0;
 	}
 
 	button.name {
@@ -159,27 +163,31 @@
 
 <svelte:window on:click={closePanel} />
 <div class="wrapper" on:click={e => e.stopPropagation()} class:empty={users.length === 0}>
-	<header on:click={openPanel} class:closed={!opened}>
-		{users.length} player{users.length !== 1 ? 's' : ''}
+	<header on:click={togglePanel} class:closed={!opened}>
+		{#if phase === "pregame" || phase === "starting"}
+			{users.length} player{users.length !== 1 ? 's' : ''}
+			<button on:click={startGame}>Start game</button>
+		{:else if yourTurn}
+			Your turn
+			{#if !drawn}
+				<button on:click={drawCard}>Draw Card</button>
+			{:else}
+				<div>
+					Drawn:
+					<span class="drawn-card">{drawn}</span>
+				</div>
+			{/if}
+		{:else}
+			{users.find(u => u.id === currentId).name}'s turn
+		{/if}
 	</header>
 	<div class="collapsible" style={`height:${opened ? hiddenHeight : 0}px;`}>
 		<div bind:this={hiddenPanel}>
-			<div class="controls">
-				{#if phase === "pregame" || phase === "starting"}
-					<button on:click={startGame}>Start game</button>
-				{:else}
-					{#if phase === "started"}
-						{#if yourTurn}
-							{#if !drawn}
-								<button on:click={() => dispatch("draw-card")}>Draw Card</button>
-							{:else}
-								<span class="drawn-card">{drawn}</span>
-							{/if}
-						{/if}
-						<button on:click={passTurn}>Pass Turn</button>
-					{/if}
-				{/if}
-			</div>
+			{#if phase === "started"}
+				<div class="controls">
+					<button on:click={passTurn}>Pass Turn</button>
+				</div>
+			{/if}
 			<ol class="users-list">
 				{#each users as user (user.id)}
 					<li class:self={user.id === selfId} class:current={!pregame && user.id === currentId}>

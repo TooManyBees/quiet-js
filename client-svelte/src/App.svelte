@@ -213,24 +213,22 @@
 		tool={selectedTool}
 		projects={state.projects}
 	/>
-	<div class="wrapper">
-		<Tools
-			bind:selected={selectedTool}
-			on:expand-canvas={expandCanvas}
-		/>
-		<Users
-			selfId={$userId}
-			users={users}
-			currentId={currentId}
-			drawn={drawn}
-			phase={state.phase}
-			on:change-name={(event) => changeMyName(event.detail.name)}
-			on:start-game={initiateStartGame}
-			on:draw-card={drawCard}
-			on:pass-turn={passYourTurn}
-			on:pass-others-turn={passOthersTurn}
-		/>
-	</div>
+	<Tools
+		bind:selected={selectedTool}
+		on:expand-canvas={expandCanvas}
+	/>
+	<Users
+		selfId={$userId}
+		users={users}
+		currentId={currentId}
+		drawn={drawn}
+		phase={state.phase}
+		on:change-name={(event) => changeMyName(event.detail.name)}
+		on:start-game={initiateStartGame}
+		on:draw-card={drawCard}
+		on:pass-turn={passYourTurn}
+		on:pass-others-turn={passOthersTurn}
+	/>
 	{#if state.phase === "starting"}
 		<Modal on:cancel={() => state = reducer(state, { type: "game:cancel-start" })}>
 			<StartGame on:start-game={startGame} />
@@ -272,20 +270,5 @@
 		height: 100%;
 		box-sizing: border-box;
 		border-radius: 0.25rem;
-	}
-	.wrapper {
-		position: fixed;
-		top: 0;
-		left: 0;
-		width: 100%;
-		box-sizing: border-box;
-		padding: 10px;
-		display: flex;
-		justify-content: space-between;
-		align-items: flex-start;
-		pointer-events: none;
-	}
-	.wrapper > :global(*) {
-		pointer-events: auto;
 	}
 </style>

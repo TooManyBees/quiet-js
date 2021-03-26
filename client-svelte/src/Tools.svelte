@@ -31,6 +31,9 @@
     display: flex;
     justify-content: space-between;
     align-items: flex-start;
+    position: fixed;
+    top: 1rem;
+    left: 1rem;
   }
 
   @media (min-width: 361px) {
@@ -42,6 +45,10 @@
     }
   }
   @media (max-width: 360px) {
+    #tool-palette {
+      top: 0.5rem;
+      left: 0.5rem;
+    }
     #tool-palette > :not(:first-child) {
       margin-left: 0.25rem;
     }
