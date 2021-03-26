@@ -65,6 +65,11 @@ export default function(node, tool) {
   let pointerDist;
   let zoomLevel = 1;
 
+  function pinchZoom(pixels) {
+    const nodeSize = node.width;
+    zoomLevel *= (1 + -1 * pixels / nodeSize);
+  }
+
   function pointerDistance(p1, p2) {
     // For now, distance squared
     return Math.pow(p1.clientX - p2.clientX, 2) + Math.pow(p1.clientY - p2.clientY, 2);
@@ -174,12 +179,34 @@ export default function(node, tool) {
   node.addEventListener("pointerleave", onpointerup);
   node.addEventListener("pointerup", onpointerup);
 
+  function onwheel(e) {
+    e.preventDefault();
+
+    switch (e.deltaMode) {
+    case WheelEvent.DOM_DELTA_PIXEL:
+      pinchZoom(e.deltaY);
+      break;
+    case WheelEvent.DOM_DELTA_LINE:
+      pinchZoom(e.deltaY * 16);
+      brak;
+    default:
+    }
+
+    node.dispatchEvent(new CustomEvent("transform", {
+      detail: {
+        x: panX, y: panY, scale: zoomLevel,
+      }
+    }));
+  }
+  node.addEventListener("wheel", onwheel);
+
   return {
     destroy() {
       node.removeEventListener("pointerdown", onpointerdown);
       node.removeEventListener("pointercancel", onpointerup);
       node.removeEventListener("pointerleave", onpointerup);
       node.removeEventListener("pointerup", onpointerup);
+      node.removeEventListener("wheel", onwheel);
     },
     update(newTool) {
       tool = newTool;
