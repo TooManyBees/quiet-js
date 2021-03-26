@@ -78,7 +78,7 @@
 <div class="buttons">
   <button class="open-button" on:click={() => howToVisible = true}>
     <img src="/icons/question-mark.svg" alt="Question mark">
-    <span class="label">How to use this site</span>
+    <span class="label">How to play</span>
   </button>
   <button class="open-button" on:click={() => aboutVisible = true}>
     <img src="/icons/info.svg" alt="Info bubble">
@@ -89,24 +89,27 @@
   <div class="underlay" on:click={() => howToVisible = false}></div>
   <aside transition:fly={{ y: 200, duration: 250 }}>
     <header>
-      <h1>How to play The Quiet Year remotely</h1>
+      <h1>How to play <a href="https://buriedwithoutceremony.com/the-quiet-year" target="_blank">The Quiet Year</a> remotely</h1>
       <CancelButton onclick={() => howToVisible = false} />
     </header>
 
-    <p>
-      Before playing, bring up <a href="https://buriedwithoutceremony.com/wp-content/uploads/2019/08/The-Quiet-Year-Oracle.pdf" target="_blank">The Oracle</a> for reference.
+    <p>For rules, <a href="https://store.buriedwithoutceremony.com/collections/frontpage/products/the-quiet-year-pdf" target="_blank">get a copy</a>. Before playing, bring up <a href="https://buriedwithoutceremony.com/wp-content/uploads/2019/08/The-Quiet-Year-Oracle.pdf" target="_blank">The Oracle</a> for reference.
     </p>
 
     <p>
-      Hop on a voice chat with your friends. One person join a random room on this site, then share the link.
+      Hop on a voice chat with your friends. One person join a random room on this site, then share the link. The first person to click <em>Start game</em> takes the first turn. The game will shuffle a deck of 52 or 36 cards for you.
     </p>
 
     <p>
-      Anyone can draw, erase, or place projects at any time. Anyone can join the room at any time and get added to the turn order. Anyone can end the current turn early and advance to the next player. The only action that's restricted by being your turn is drawing a card. Due to this lack of guard rails, I only recommend playing with people you'd feel comfortable sitting across a table from.
+      On your turn, click <em>Draw card</em> to draw a card. No one will see it except you, so announce it to the other players. When you're done, click <em>Pass turn</em>.
     </p>
 
     <p>
-      On your turn, click the Draw button to draw a card. Announce your action to your friends, because they can't see it. Projects will automatically tick down when you end your turn, but it's up to you to remove them when appropriate. The only other automatic actions are to shuffle a virtual deck for you, and discard cards when <span class="card">KING_DIAMONDS</span> is drawn.
+      The game will handle <span class="card">KING_DIAMONDS</span> and reducing project dice on its own. It's on the players to remove projects when appropriate.
+    </p>
+
+    <p>
+      Anyone can draw, erase, or place projects at any time. Anyone can join the room at any time and get added to the turn order. Anyone can click <em>Pass turn</em> to end the current turn early and advance to the next player. The lack of guard rails is because this app is a facilitator, not a dungeon master. I only recommend playing with people you'd feel comfortable sitting across a table from.
     </p>
   </aside>
 {/if}
@@ -114,7 +117,7 @@
   <div class="underlay" on:click={() => aboutVisible = false}></div>
   <aside transition:fly={{ y: 200, duration: 250 }}>
     <header>
-      <h1>Credits</h1>
+      <h1>About this site</h1>
       <CancelButton onclick={() => aboutVisible = false} />
     </header>
 
