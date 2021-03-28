@@ -192,6 +192,11 @@
 </script>
 
 <style>
+  .frame {
+    width: 100%;
+    height: 100%;
+    position: relative;
+  }
   .wrapper {
     display: inline-flex;
     position: relative;
@@ -211,26 +216,29 @@
 />
 
 <div
-  class="wrapper"
-  style={`
-    left: ${canvasX}px;
-    top: ${canvasY}px;
-    transform: translate(-50%, -50%) scale(${zoom});
-  `}>
-  <canvas
-    width={width}
-    height={height}
-    bind:this={canvas}
-    use:pointerEvents={tool}
-    on:drawline={handleDrawLine}
-    on:drawend={handleDrawEnd}
-    on:zoom-in={handleZoomIn}
-    on:zoom-out={handleZoomOut}
-    on:transform={handleTransform}
-    on:place-project={handlePlaceProject}
-    style={`cursor: ${cursor};`}
-  ></canvas>
-  {#each projects as project}
-    <Project {...project} on:resolve-project />
-  {/each}
+  class="frame"
+  use:pointerEvents={{ tool, canvas, canvasX, canvasY }}
+  on:drawline={handleDrawLine}
+  on:drawend={handleDrawEnd}
+  on:transform={handleTransform}
+  on:place-project={handlePlaceProject}
+  >
+  <div
+    class="wrapper"
+    style={`
+      left: ${canvasX}px;
+      top: ${canvasY}px;
+      transform: translate(-50%, -50%) scale(${zoom});
+    `}>
+    <canvas
+      id="canvas"
+      width={width}
+      height={height}
+      bind:this={canvas}
+      style={`cursor: ${cursor};`}
+    ></canvas>
+    {#each projects as project}
+      <Project {...project} on:resolve-project />
+    {/each}
+  </div>
 </div>

@@ -1,4 +1,4 @@
-export default function(node, tool) {
+export default function(node, { tool, canvas, canvasX, canvasY }) {
   const pointerCache = [];
   function addPointer(e) {
     const idx = pointerCache.findIndex(p => p.pointerId === e.pointerId);
@@ -11,6 +11,7 @@ export default function(node, tool) {
       clientX: e.clientX,
       clientY: e.clientY,
       pointerId: e.pointerId,
+      target: e.target,
     };
     if (idx > -1) {
       pointerCache[idx] = pointerMessage;
@@ -34,17 +35,29 @@ export default function(node, tool) {
 
   function drawstart(e, mode) {
     addPointer(e);
-    const thisPoint = { x: e.offsetX, y: e.offsetY };
+    const thisPoint = pointOnCanvas(e);
     const message = { a: thisPoint, b: thisPoint, weight: e.pressure, mode };
     node.dispatchEvent(new CustomEvent("drawline", {
       detail: message,
     }));
   }
 
+  function pointOnCanvas(e) {
+    if (e.target === canvas) {
+      return { x: e.offsetX, y: e.offsetY };
+    } else {
+      // Close enough!
+      return {
+        x: e.clientX - canvasX + canvas.width/2,
+        y: e.clientY - canvasY + canvas.height/2,
+      };
+    }
+  }
+
   function drawmove(e, mode) {
     const lastE = getPointer(e);
-    const thisPoint = { x: e.offsetX, y: e.offsetY };
-    const lastPoint = { x: lastE.offsetX, y: lastE.offsetY };
+    const thisPoint = pointOnCanvas(e);
+    const lastPoint = pointOnCanvas(lastE);
     const message = { a: lastPoint, b: thisPoint, weight: e.pressure, mode };
     node.dispatchEvent(new CustomEvent("drawline", {
       detail: message,
@@ -65,9 +78,12 @@ export default function(node, tool) {
   let pointerDist;
   let zoomLevel = 1;
 
-  function pinchZoom(pixels) {
-    const nodeSize = node.width;
-    zoomLevel *= (1 + -1 * pixels / nodeSize);
+  function zoomFromOrigin(x, y, pixels) {
+    const nodeSize = canvas.width;
+    const scale = -1 * pixels / nodeSize
+    zoomLevel *= (1 + scale);
+    panX += (canvasX - x) * scale;
+    panY += (canvasY - y) * scale;
   }
 
   function pointerDistance(p1, p2) {
@@ -111,10 +127,13 @@ export default function(node, tool) {
   /*---------- Begin zoom controls -----------*/
   function zoom(e) {
     if (e.altKey) {
-      node.dispatchEvent(new CustomEvent("zoom-out"));
+      zoomFromOrigin(e.clientX, e.clientY, canvas.width / 3);
     } else {
-      node.dispatchEvent(new CustomEvent("zoom-in"));
+      zoomFromOrigin(e.clientX, e.clientY, canvas.width * -0.5);
     }
+    node.dispatchEvent(new CustomEvent("transform", {
+      detail: { x: panX, y: panY, scale: zoomLevel },
+    }));
   }
   /*----------- End zoom controls ------------*/
 
@@ -184,10 +203,10 @@ export default function(node, tool) {
 
     switch (e.deltaMode) {
     case WheelEvent.DOM_DELTA_PIXEL:
-      pinchZoom(e.deltaY);
+      zoomFromOrigin(e.clientX, e.clientY, e.deltaY);
       break;
     case WheelEvent.DOM_DELTA_LINE:
-      pinchZoom(e.deltaY * 16);
+      zoomFromOrigin(e.clientX, e.clientY, e.deltaY * 16);
       brak;
     default:
     }
@@ -208,8 +227,11 @@ export default function(node, tool) {
       node.removeEventListener("pointerup", onpointerup);
       node.removeEventListener("wheel", onwheel);
     },
-    update(newTool) {
+    update({ tool: newTool, canvas: newCanvas, canvasX: newCanvasX, canvasY: newCanvasY }) {
       tool = newTool;
+      canvas = newCanvas;
+      canvasX = newCanvasX;
+      canvasY = newCanvasY;
     }
   }
 }
