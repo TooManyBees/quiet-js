@@ -259,8 +259,6 @@
 		background-image: linear-gradient(20deg, var(--gradient-bottom), var(--gradient-middle) 30%, var(--gradient-middle) 70%, var(--gradient-top));
 	}
 	main.your-turn {
-		/*padding: 0;*/
-		/*border: 0.25rem dashed #ff0086;*/
 		background-color: var(--accent);
 		background-image: none;
 		--outline: var(--accent);
@@ -271,5 +269,6 @@
 		height: 100%;
 		box-sizing: border-box;
 		border-radius: 0.25rem;
+		overflow: hidden;
 	}
 </style>
