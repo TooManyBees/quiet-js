@@ -152,6 +152,7 @@ export default function() {
 
       /*--------- Begin project controls ---------*/
       function placeProject(e) {
+        if (e.target !== canvas) return;
         const x = e.offsetX;
         const y = e.offsetY;
         node.dispatchEvent(new CustomEvent("place-project", {
