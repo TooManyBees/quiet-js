@@ -28,12 +28,11 @@
     case "project":
       cursor = "crosshair";
       break;
-    case "zoom":
-      if (altKey) {
-        cursor = "zoom-out";
-      } else {
-        cursor = "zoom-in";
-      }
+    case "zoom-in":
+      cursor = altKey ? "zoom-out" : "zoom-in";
+      break;
+    case "zoom-out":
+      cursor = altKey ? "zoom-in" : "zoom-out";
       break;
     case "pan":
       cursor = "grab";

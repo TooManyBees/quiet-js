@@ -140,12 +140,13 @@ export default function() {
       /*--------- End transform controls ---------*/
 
       /*---------- Begin zoom controls -----------*/
-      function zoom(e) {
-        if (e.altKey) {
-          zoomFromOrigin(e.clientX, e.clientY, canvas.width / 3);
-        } else {
-          zoomFromOrigin(e.clientX, e.clientY, canvas.width * -0.5);
-        }
+      function zoomIn(e) {
+        zoomFromOrigin(e.clientX, e.clientY, canvas.width * -0.5);
+        fireTransformEvent();
+      }
+
+      function zoomOut(e) {
+        zoomFromOrigin(e.clientX, e.clientY, canvas.width / 3);
         fireTransformEvent();
       }
       /*----------- End zoom controls ------------*/
@@ -167,8 +168,10 @@ export default function() {
           return drawstart(e, "draw");
         case "erase":
           return drawstart(e, "erase");
-        case "zoom":
-          return zoom(e);
+        case "zoom-in":
+          return zoomIn(e);
+        case "zoom-out":
+          return zoomOut(e);
         case "pan":
           return transformstart(e);
         case "project":

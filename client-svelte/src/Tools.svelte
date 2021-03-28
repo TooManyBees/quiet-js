@@ -85,6 +85,17 @@
     top: 3px;
     left: 1px;
   }
+
+  .zoom-group {
+    display: flex;
+    flex-direction: column;
+  }
+  .zoom-group:hover .hidden {
+    display: block;
+  }
+  .hidden {
+    display: none;
+  }
 </style>
 
 <svelte:window
@@ -105,10 +116,16 @@
     <input type="radio" bind:group={selectedButton} value="erase">
     <img src="/icons/eraser.svg" alt="eraser" title="Erase">
   </label>
-  <label class:selected={selected === "zoom"}>
-    <input type="radio" bind:group={selectedButton} value="zoom">
-    <img class="magnifier" src="/icons/zoom-in.svg" alt="magnifying glass with plus" title="Zoom In">
-  </label>
+  <div class="zoom-group">
+    <label class:selected={selected === "zoom-in"} class:hidden={selected === "zoom-out"}>
+      <input type="radio" bind:group={selectedButton} value="zoom-in">
+      <img class="magnifier" src="/icons/zoom-in.svg" alt="magnifying glass with plus" title="Zoom In">
+    </label>
+    <label class:selected={selected === "zoom-out"} class:hidden={selected !== "zoom-out"}>
+      <input type="radio" bind:group={selectedButton} value="zoom-out">
+      <img class="magnifier" src="/icons/zoom-out.svg" alt="magnifying glass with minus" title="Zoom Out">
+    </label>
+  </div>
   <label class:selected={selected === "project"}>
     <input type="radio" bind:group={selectedButton} value="project">
     <img src="/icons/dice.svg" alt="6 sided die" title="Place new project">

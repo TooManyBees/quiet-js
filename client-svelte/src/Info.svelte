@@ -124,19 +124,25 @@
     <h2>Tools</h2>
     <ul class="tools">
       <li>
-        <img src="/icons/move-selector.svg" alt="Cross with arrows pointing in 4 directions"> Move the map around
+        <img src="/icons/move-selector.svg" alt="Cross with arrows pointing in 4 directions">
+        Move the map around
       </li>
       <li>
-        <img src="/icons/pencil.svg" alt="pencil"> Draw on the map
+        <img src="/icons/pencil.svg" alt="pencil">
+        Draw on the map
       </li>
       <li>
-        <img src="/icons/eraser.svg" alt="eraser"> Erase on the map
+        <img src="/icons/eraser.svg" alt="eraser">
+        Erase on the map
       </li>
       <li>
-        <img class="magnifier" src="/icons/zoom-in.svg" alt="magnifying glass with plus"> Zoom in (hold Alt to zoom out)
+        <img src="/icons/zoom-in.svg" alt="magnifying glass with plus">
+        <img src="/icons/zoom-out.svg" alt="magnifying glass with minus">
+        Zoom in or out
       </li>
       <li>
-        <img src="/icons/dice.svg" alt="6 sided die"> Place a project on the map
+        <img src="/icons/dice.svg" alt="6 sided die">
+        Place a project on the map
       </li>
     </ul>
   </aside>
