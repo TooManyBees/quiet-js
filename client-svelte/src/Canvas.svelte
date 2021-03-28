@@ -22,10 +22,10 @@
 
   let cursor = "pointer";
   let altKey = false;
-  // TODO: tool name triggers CSS rules so we can use url() for custom cursors
   $: switch (tool) {
     case "draw":
     case "erase":
+    case "project":
       cursor = "crosshair";
       break;
     case "zoom":

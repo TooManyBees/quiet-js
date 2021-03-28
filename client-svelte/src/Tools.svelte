@@ -1,7 +1,7 @@
 <script>
   import { createEventDispatcher } from "svelte";
-  export let selected = "draw";
-  let selectedButton = "draw";
+  export let selected = "pan";
+  let selectedButton = "pan";
   let selectedOverride = null;
   $: {
     selected = selectedOverride || selectedButton;
@@ -32,8 +32,8 @@
     justify-content: space-between;
     align-items: flex-start;
     position: fixed;
-    top: 1rem;
-    left: 1rem;
+    top: 0.5rem;
+    left: 0.5rem;
   }
 
   @media (min-width: 361px) {
@@ -45,10 +45,6 @@
     }
   }
   @media (max-width: 360px) {
-    #tool-palette {
-      top: 0.5rem;
-      left: 0.5rem;
-    }
     #tool-palette > :not(:first-child) {
       margin-left: 0.25rem;
     }
@@ -97,6 +93,10 @@
 />
 
 <div id="tool-palette">
+  <label class:selected={selected === "pan"}>
+    <input type="radio" bind:group={selectedButton} value="pan">
+    <img src="/icons/move-selector.svg" alt="Cross with arrows pointing in 4 directions" title="Pan">
+  </label>
   <label class:selected={selected === "draw"}>
     <input type="radio" bind:group={selectedButton} value="draw">
     <img src="/icons/pencil.svg" alt="pencil" title="Draw">
@@ -108,10 +108,6 @@
   <label class:selected={selected === "zoom"}>
     <input type="radio" bind:group={selectedButton} value="zoom">
     <img class="magnifier" src="/icons/zoom-in.svg" alt="magnifying glass with plus" title="Zoom In">
-  </label>
-  <label class:selected={selected === "pan"}>
-    <input type="radio" bind:group={selectedButton} value="pan">
-    <img src="/icons/move-selector.svg" alt="Cross with arrows pointing in 4 directions" title="Pan">
   </label>
   <label class:selected={selected === "project"}>
     <input type="radio" bind:group={selectedButton} value="project">
