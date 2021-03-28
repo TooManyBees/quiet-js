@@ -1,4 +1,5 @@
 import { newDeck } from "./game.js";
+import { INITIAL_CANVAS_SIZE } from "./constants";
 
 export function initialState() {
   return {
@@ -11,8 +12,8 @@ export function initialState() {
     currentPeerId: null,
     projects: [],
     canvasSize: {
-      width: 256,
-      height: 256,
+      width: INITIAL_CANVAS_SIZE,
+      height: INITIAL_CANVAS_SIZE,
     },
     history: [],
   };

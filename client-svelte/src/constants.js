@@ -1,0 +1,1 @@
+export const INITIAL_CANVAS_SIZE = 1024;

@@ -1,5 +1,6 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from "svelte";
+  import { INITIAL_CANVAS_SIZE } from "./constants";
   import Project from "./Project.svelte";
   import makePointerEvents from "./pointer-events.js";
 
@@ -7,8 +8,8 @@
 
   const EXPANSION = 256;
 
-  export let width = 256;
-  export let height = 256;
+  export let width = INITIAL_CANVAS_SIZE;
+  export let height = INITIAL_CANVAS_SIZE;
   export let tool;
   export let projects = [];
 

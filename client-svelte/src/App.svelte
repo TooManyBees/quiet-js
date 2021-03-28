@@ -1,5 +1,6 @@
 <script>
 	import { onMount } from "svelte";
+	import { INITIAL_CANVAS_SIZE } from "./constants";
 	import {
 		connect,
 		userId,
@@ -35,7 +36,7 @@
 
 	let needHistory = true;
 	let canvas;
-	let selectedTool = "draw";
+	let selectedTool;
 	$: currentId = $userIds.includes(state.currentPeerId) ? state.currentPeerId : $userIds[0];
 	$: yourTurn = state.phase === "started" && $userId === currentId;
 	$: drawn = state.yourTurn.drawn;
@@ -204,8 +205,8 @@
 <main class:your-turn={yourTurn}>
 	<div class="frame">
 	<Canvas
-		width={256}
-		height={256}
+		width={INITIAL_CANVAS_SIZE}
+		height={INITIAL_CANVAS_SIZE}
 		bind:this={canvas}
 		on:drawmulti={handleDrawMulti}
 		on:place-project={initiatePlaceProject}
