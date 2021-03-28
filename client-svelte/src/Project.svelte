@@ -9,6 +9,11 @@
   $: diceCode = Math.min(6, Math.max(0, parseInt(weeks, 10) || 0));
 
   const dispatch = createEventDispatcher();
+
+  function resolveProject(event) {
+    event.stopPropagation();
+    dispatch("resolve-project", { id });
+  }
 </script>
 
 <style>
@@ -38,6 +43,6 @@
     {#if description}
       <p class="description">{description}</p>
     {/if}
-    <button on:click={() => dispatch("resolve-project", { id })}>Resolve</button>
+    <button on:click={resolveProject}>Resolve</button>
   </div>
 </div>
