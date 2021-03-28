@@ -80,8 +80,8 @@ export default function(node, { tool, canvas, canvasX, canvasY }) {
 
   function zoomFromOrigin(x, y, pixels) {
     const nodeSize = canvas.width;
-    const scale = -1 * pixels / nodeSize
-    zoomLevel *= (1 + scale);
+    const scale = -1 * pixels / nodeSize;
+    zoomLevel = Math.max(0.01, zoomLevel * (1 + scale));
     panX += (canvasX - x) * scale;
     panY += (canvasY - y) * scale;
   }
@@ -108,7 +108,7 @@ export default function(node, { tool, canvas, canvasX, canvasY }) {
       const p1 = pointerCache[0];
       const p2 = pointerCache[1];
       const newDist = pointerDistance(p1, p2);
-      zoomLevel *= (newDist / pointerDist);
+      zoomLevel = Math.max(0.01, zoomLevel * (newDist / pointerDist));
       pointerDist = newDist;
     }
     node.dispatchEvent(new CustomEvent("transform", {
@@ -208,7 +208,7 @@ export default function(node, { tool, canvas, canvasX, canvasY }) {
     if (isZoom) {
       switch (e.deltaMode) {
       case WheelEvent.DOM_DELTA_PIXEL:
-        zoomFromOrigin(e.clientX, e.clientY, e.deltaY);
+        zoomFromOrigin(e.clientX, e.clientY, e.deltaY * 4);
         break;
       case WheelEvent.DOM_DELTA_LINE:
         zoomFromOrigin(e.clientX, e.clientY, e.deltaY * 16);
