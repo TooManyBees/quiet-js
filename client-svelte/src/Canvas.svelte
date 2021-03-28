@@ -1,7 +1,9 @@
 <script>
   import { onMount, onDestroy, createEventDispatcher } from "svelte";
   import Project from "./Project.svelte";
-  import pointerEvents from "./pointer-events.js";
+  import makePointerEvents from "./pointer-events.js";
+
+  const { pointerEvents, fitToWindow } = makePointerEvents();
 
   const EXPANSION = 256;
 
@@ -81,6 +83,7 @@
       // }
       const imageData = new ImageData(new Uint8ClampedArray(bytes), canvas.width, canvas.height);
       context.putImageData(imageData, 0, 0);
+      fitToWindow();
     }
   }
 
@@ -184,6 +187,7 @@
     context = canvas.getContext("2d", { alpha: false });
     context.fillStyle = "white";
     context.fillRect(0, 0, canvas.width, canvas.height);
+    fitToWindow();
   });
 
   onDestroy(() => {
@@ -217,7 +221,8 @@
 
 <div
   class="frame"
-  use:pointerEvents={{ tool, canvas, canvasX, canvasY }}
+  style={`cursor: ${cursor};`}
+  use:pointerEvents={{ tool, canvasX, canvasY }}
   on:drawline={handleDrawLine}
   on:drawend={handleDrawEnd}
   on:transform={handleTransform}
@@ -231,11 +236,9 @@
       transform: translate(-50%, -50%) scale(${zoom});
     `}>
     <canvas
-      id="canvas"
       width={width}
       height={height}
       bind:this={canvas}
-      style={`cursor: ${cursor};`}
     ></canvas>
     {#each projects as project}
       <Project {...project} on:resolve-project />
