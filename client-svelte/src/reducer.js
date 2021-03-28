@@ -99,7 +99,7 @@ export function reducer(state, action) {
     case "game:remove-project": {
       const projects = [...state.projects];
       const idx = projects.findIndex(p => p.id === action.payload.id);
-      if (idx) {
+      if (idx >= 0) {
         projects.splice(idx, 1);
       }
       return {
