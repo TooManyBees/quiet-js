@@ -30,8 +30,6 @@ export default function(node, { tool, canvas, canvasX, canvasY }) {
   }
 
   /*--------- Begin drawing controls ---------*/
-  let lastdrawmove;
-  let lastdrawend;
 
   function drawstart(e, mode) {
     addPointer(e);
@@ -78,6 +76,8 @@ export default function(node, { tool, canvas, canvasX, canvasY }) {
   let pointerDist;
   let zoomLevel = 1;
 
+  /*-------- Begin transform controls --------*/
+
   function zoomFromOrigin(x, y, pixels) {
     const nodeSize = canvas.width;
     const scale = -1 * pixels / nodeSize
@@ -123,6 +123,8 @@ export default function(node, { tool, canvas, canvasX, canvasY }) {
       pointerDist = pointerDistance(pointerCache[0], pointerCache[1]);
     }
   }
+
+  /*--------- End transform controls ---------*/
 
   /*---------- Begin zoom controls -----------*/
   function zoom(e) {
@@ -201,14 +203,30 @@ export default function(node, { tool, canvas, canvasX, canvasY }) {
   function onwheel(e) {
     e.preventDefault();
 
-    switch (e.deltaMode) {
-    case WheelEvent.DOM_DELTA_PIXEL:
-      zoomFromOrigin(e.clientX, e.clientY, e.deltaY);
-      break;
-    case WheelEvent.DOM_DELTA_LINE:
-      zoomFromOrigin(e.clientX, e.clientY, e.deltaY * 16);
-      brak;
-    default:
+    const isZoom = e.ctrlKey;
+
+    if (isZoom) {
+      switch (e.deltaMode) {
+      case WheelEvent.DOM_DELTA_PIXEL:
+        zoomFromOrigin(e.clientX, e.clientY, e.deltaY);
+        break;
+      case WheelEvent.DOM_DELTA_LINE:
+        zoomFromOrigin(e.clientX, e.clientY, e.deltaY * 16);
+        break;
+      default:
+      }
+    } else {
+      switch (e.deltaMode) {
+      case WheelEvent.DOM_DELTA_PIXEL:
+        panX -= e.deltaX;
+        panY -= e.deltaY;
+        break;
+      case WheelEvent.DOM_DELTA_LINE:
+        panX -= e.deltaX * 16;
+        panY -= e.deltaY * 16;
+        break;
+      default:
+      }
     }
 
     node.dispatchEvent(new CustomEvent("transform", {
