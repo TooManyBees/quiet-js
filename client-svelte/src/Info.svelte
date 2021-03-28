@@ -73,6 +73,16 @@
     right: 0;
     bottom: 0;
   }
+
+  .tools {
+    list-style: none;
+    padding-left: 0;
+  }
+
+  .tools img {
+    width: 16px;
+    height: 16px;
+  }
 </style>
 
 <div class="buttons">
@@ -111,6 +121,24 @@
     <p>
       Anyone can draw, erase, or place projects at any time. Anyone can join the room at any time and get added to the turn order. Anyone can click <em>Pass turn</em> to end the current turn early and advance to the next player. The lack of guard rails is because this app is a facilitator, not a dungeon master. I only recommend playing with people you'd feel comfortable sitting across a table from.
     </p>
+    <h2>Tools</h2>
+    <ul class="tools">
+      <li>
+        <img src="/icons/move-selector.svg" alt="Cross with arrows pointing in 4 directions"> Move the map around
+      </li>
+      <li>
+        <img src="/icons/pencil.svg" alt="pencil"> Draw on the map
+      </li>
+      <li>
+        <img src="/icons/eraser.svg" alt="eraser"> Erase on the map
+      </li>
+      <li>
+        <img class="magnifier" src="/icons/zoom-in.svg" alt="magnifying glass with plus"> Zoom in (hold Alt to zoom out)
+      </li>
+      <li>
+        <img src="/icons/dice.svg" alt="6 sided die"> Place a project on the map
+      </li>
+    </ul>
   </aside>
 {/if}
 {#if aboutVisible}
