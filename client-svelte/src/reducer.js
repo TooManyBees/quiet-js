@@ -43,9 +43,11 @@ export function reducer(state, action) {
     }
     case "game:draw-card": {
       const drawn = state.deck[0];
-      const deck = state.deck.slice(1);
+      const cardsToDiscard = drawn === "KING_DIAMONDS" ? 3 : 1;
+      const deck = state.deck.slice(cardsToDiscard);
       return {
         ...state,
+        phase: drawn === "KING_SPADES" ? "finished" : state.phase,
         yourTurn: {
           ...state.yourTurn,
           drawn,
