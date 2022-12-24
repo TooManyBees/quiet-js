@@ -126,7 +126,6 @@
 	}
 
 	li .name {
-		padding: 5px;
 		display: block;
 	}
 
@@ -147,7 +146,8 @@
 	input {
 		width: 8rem;
 		display: block;
-		margin: 0;
+		margin: 0 -5px;
+		padding: 5px;
 		border: none;
 	}
 
