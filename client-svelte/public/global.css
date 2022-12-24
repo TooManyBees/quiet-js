@@ -15,6 +15,7 @@ body {
 	--gradient-middle: #ae81ff;
 	--gradient-top: #15A1FF;
 
+	--headline: #9770ff;
 	--outline: var(--gradient-middle);
 
 	color: var(--fg);

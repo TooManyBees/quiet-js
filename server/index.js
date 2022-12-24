@@ -100,6 +100,14 @@ app.get("/admin/status", basicAuthMiddleware, (req, res) => {
   res.json(status);
 });
 
+app.get("/api/new", (req, res) => {
+  let slug;
+  while (!slug || rooms.has(slug)) {
+    slug = generateRoomName();
+  }
+  res.json({ slug });
+});
+
 app.get("/api/canvas-data", auth, (req, res) => {
   const userId = req.user.id;
 
