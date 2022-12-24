@@ -13,10 +13,12 @@
 	import { getUserName, setUserName } from "./storage.js";
 	import { initialState, reducer } from "./reducer.js";
 	import Canvas from "./Canvas.svelte";
+	import History from "./History.svelte";
 	import Info from "./Info.svelte";
 	import Modal from "./Modal.svelte";
 	import StartGame from "./Modal/StartGame.svelte";
 	import PlacingProject from "./Modal/PlacingProject.svelte";
+	import Sidebar from "./Sidebar.svelte";
 	import Tools from "./Tools.svelte";
 	import Users from "./Users.svelte";
 
@@ -218,18 +220,24 @@
 		bind:selected={selectedTool}
 		on:expand-canvas={expandCanvas}
 	/>
-	<Users
-		selfId={$userId}
-		users={users}
-		currentId={currentId}
-		drawn={drawn}
-		phase={state.phase}
-		on:change-name={(event) => changeMyName(event.detail.name)}
-		on:start-game={initiateStartGame}
-		on:draw-card={drawCard}
-		on:pass-turn={passYourTurn}
-		on:pass-others-turn={passOthersTurn}
-	/>
+	<Sidebar selfId={$userId} currentId={currentId}>
+		<Users
+			selfId={$userId}
+			users={users}
+			currentId={currentId}
+			drawn={drawn}
+			phase={state.phase}
+			on:change-name={(event) => changeMyName(event.detail.name)}
+			on:start-game={initiateStartGame}
+			on:draw-card={drawCard}
+			on:pass-turn={passYourTurn}
+			on:pass-others-turn={passOthersTurn}
+		/>
+		<History
+			userNames={userNames}
+			history={state.history}
+		/>
+	</Sidebar>
 	{#if state.phase === "starting"}
 		<Modal on:cancel={() => state = reducer(state, { type: "game:cancel-start" })}>
 			<StartGame on:start-game={startGame} />

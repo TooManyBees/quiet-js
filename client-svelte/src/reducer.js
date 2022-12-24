@@ -76,7 +76,7 @@ export function reducer(state, action) {
         ];
       }
       const history = drawn
-        ? [drawn, ...state.history]
+        ? [{ userId, drawn }, ...state.history]
         : state.history;
 
       return {

@@ -10,20 +10,20 @@
 
 	const dispatch = createEventDispatcher();
 
-	let opened = false;
-	let hiddenPanel;
-	let hiddenHeight = 0;
-	afterUpdate(() => {
-		if (hiddenPanel) {
-			hiddenHeight = hiddenPanel.getBoundingClientRect().height;
-		}
-	});
-	function togglePanel() {
-		opened = !opened;
-	}
-	function closePanel() {
-		opened = false;
-	}
+	// let opened = false;
+	// let hiddenPanel;
+	// let hiddenHeight = 0;
+	// afterUpdate(() => {
+	// 	if (hiddenPanel) {
+	// 		hiddenHeight = hiddenPanel.getBoundingClientRect().height;
+	// 	}
+	// });
+	// function togglePanel() {
+	// 	opened = !opened;
+	// }
+	// function closePanel() {
+	// 	opened = false;
+	// }
 
 	let editing = false;
 	let focusEditField = false;
@@ -70,45 +70,21 @@
 </script>
 
 <style>
-	.wrapper {
-		border-top-left-radius: 0.5rem;
-		border-top-right-radius: 0.5rem;
-		border-style: solid;
-		border-color: var(--outline);
-		border-width: 4px 4px 0 4px;
-		overflow: hidden;
-		min-width: 10rem;
-		max-width: 15rem;
-
-		position: fixed;
-		bottom: 0;
-		right: 1rem;
-
-		background-color: var(--bg-med);
-	}
-
 	.collapsible {
 		transition: height 0.25s;
 	}
 
 	header {
-		padding: 0.4rem 1rem;
+		margin-bottom: 0.5rem;
 		font-size: 1.5rem;
-		cursor: pointer;
-	}
-
-	.users-list {
-		padding: 1rem;
 	}
 
 	.controls {
+		font-size: 1rem;
 		padding: 1rem 1rem 0 1rem;
 		display: flex;
 		flex-direction: column;
 		align-items: center;
-	}
-
-	.controls button {
 	}
 
 	.wrapper.empty {
@@ -161,9 +137,9 @@
 	}
 </style>
 
-<svelte:window on:click={closePanel} />
-<div class="wrapper" on:click={e => e.stopPropagation()} class:empty={users.length === 0}>
-	<header on:click={togglePanel} class:closed={!opened}>
+<!-- <svelte:window on:click={closePanel} /> -->
+<div on:click={e => e.stopPropagation()}>
+	<header>
 		{#if phase === "pregame" || phase === "starting"}
 			{users.length} player{users.length !== 1 ? 's' : ''}
 			<button on:click={startGame}>Start game</button>
@@ -180,14 +156,13 @@
 		{:else}
 			{users.find(u => u.id === currentId).name}'s turn
 		{/if}
+		{#if phase === "started"}
+			<div class="controls">
+				<button on:click={passTurn}>Pass {yourTurn ? "Your" : "Their"} Turn</button>
+			</div>
+		{/if}
 	</header>
-	<div class="collapsible" style={`height:${opened ? hiddenHeight : 0}px;`}>
-		<div bind:this={hiddenPanel}>
-			{#if phase === "started"}
-				<div class="controls">
-					<button on:click={passTurn}>Pass Turn</button>
-				</div>
-			{/if}
+	<div>
 			<ol class="users-list">
 				{#each users as user (user.id)}
 					<li class:self={user.id === selfId} class:current={!pregame && user.id === currentId}>
@@ -215,6 +190,5 @@
 					</li>
 				{/each}
 			</ol>
-		</div>
 	</div>
 </div>
