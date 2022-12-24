@@ -70,10 +70,6 @@
 </script>
 
 <style>
-	.collapsible {
-		transition: height 0.25s;
-	}
-
 	header {
 		margin-bottom: 0.5rem;
 		font-size: 1.5rem;
@@ -87,9 +83,9 @@
 		align-items: center;
 	}
 
-	.wrapper.empty {
+	/*.wrapper.empty {
 		display: none;
-	}
+	}*/
 
 	ol {
 		list-style: none;

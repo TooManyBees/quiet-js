@@ -38,9 +38,9 @@
     padding: 0.5rem 1rem;
   }
 
-  .collapsible {
+  /*.collapsible {
     transition: height 0.25s;
-  }
+  }*/
 
 </style>
 
