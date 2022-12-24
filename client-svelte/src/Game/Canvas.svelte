@@ -21,7 +21,6 @@
   let lastPoint;
 
   let cursor = "pointer";
-  let altKey = false;
   $: switch (tool) {
     case "draw":
     case "erase":
@@ -29,10 +28,10 @@
       cursor = "crosshair";
       break;
     case "zoom-in":
-      cursor = altKey ? "zoom-out" : "zoom-in";
+      cursor = "zoom-in";
       break;
     case "zoom-out":
-      cursor = altKey ? "zoom-in" : "zoom-out";
+      cursor = "zoom-out";
       break;
     case "pan":
       cursor = "grab";
@@ -215,8 +214,6 @@
 <svelte:window
   bind:innerWidth={windowWidth}
   bind:innerHeight={windowHeight}
-  on:keydown={handleKeydown}
-  on:keyup={handleKeyup}
 />
 
 <div

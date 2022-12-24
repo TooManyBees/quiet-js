@@ -14,14 +14,30 @@
   }
 
   function handleKeydown(e) {
-    if (event.key === " ") {
+    if (e.key === " ") {
       selectedOverride = "pan";
+    } else if (e.key === "Alt") {
+      switch (selected) {
+      case "zoom-in":
+        selectedOverride = "zoom-out";
+        break;
+      case "zoom-out":
+        selectedOverride = "zoom-in";
+        break;
+      }
     }
   }
 
   function handleKeyup(e) {
-    if (event.key === " ") {
+    if (e.key === " ") {
       selectedOverride = null;
+    } else if (e.key === "Alt") {
+      switch (selected) {
+      case "zoom-in":
+      case "zoom-out":
+        selectedOverride = null;
+        break;
+      }
     }
   }
 </script>
