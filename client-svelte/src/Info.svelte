@@ -16,6 +16,7 @@
     bottom: 0;
     box-sizing: border-box;
     max-height: 100vh;
+    width: 100%;
     display: flex;
     flex-direction: column;
   }
