@@ -41,18 +41,6 @@
       break;
   }
 
-  function handleKeydown(e) {
-    if (e.key === "Alt") {
-      altKey = true;
-    }
-  }
-
-  function handleKeyup(e) {
-    if (e.key === "Alt") {
-      altKey = false;
-    }
-  }
-
   const dispatch = createEventDispatcher();
 
   export function draw(points) {
